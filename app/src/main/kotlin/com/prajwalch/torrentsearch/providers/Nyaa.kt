@@ -65,9 +65,13 @@ class Nyaa : SearchProvider {
         val descriptionPagePath = anchorElement.attr("href")
         val descriptionPageUrl = "${info.url}$descriptionPagePath"
 
-        val magnetUri = tr
-            .selectFirst("td:nth-child(3)")
-            ?.selectFirst("a:nth-child(2)")
+        val downloadLinks = tr.selectFirst("td:nth-child(3)") ?: return null
+        val fileDownloadLink = downloadLinks
+            .selectFirst("a:nth-child(1)")
+            ?.attr("href")
+            .let { "${info.url}$it" }
+        val magnetUri = downloadLinks
+            .selectFirst("a:nth-child(2)")
             ?.attr("href")
             ?: return null
         val size = tr.selectFirst("td:nth-child(4)")?.ownText() ?: return null
@@ -89,6 +93,7 @@ class Nyaa : SearchProvider {
             category = info.specializedCategory,
             descriptionPageUrl = descriptionPageUrl,
             infoHashOrMagnetUri = InfoHashOrMagnetUri.MagnetUri(magnetUri),
+            fileDownloadLink = fileDownloadLink,
         )
     }
 }

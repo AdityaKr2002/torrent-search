@@ -49,6 +49,7 @@ fun TorrentActionsBottomSheet(
     enableDescriptionPageActions: Boolean = true,
     onBookmarkTorrent: (() -> Unit)? = null,
     onDeleteBookmark: (() -> Unit)? = null,
+    onDownloadTorrentFile: (() -> Unit)? = null,
 ) {
     // Always expand the sheet to full.
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -89,6 +90,13 @@ fun TorrentActionsBottomSheet(
                     Actions.DeleteBookmark(onClick = actionWithDismiss(it))
                 }
                 Actions.DownloadTorrent(onClick = actionWithDismiss(onDownloadTorrent))
+                onDownloadTorrentFile?.let {
+                    Action(
+                        icon = R.drawable.ic_file_save,
+                        label = R.string.torrent_list_action_download_torrent_file,
+                        onClick = actionWithDismiss(it),
+                    )
+                }
             }
             HorizontalDivider()
             ActionsGroup {

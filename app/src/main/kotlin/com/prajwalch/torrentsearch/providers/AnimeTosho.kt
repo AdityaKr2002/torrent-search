@@ -48,11 +48,10 @@ class AnimeTosho : SearchProvider {
         val (seeders, peers) = parseSeedsAndPeers(entryDiv)
 
         val uploadDate = parseUploadDate(entryDiv) ?: return null
-        val magnetUri = entryDiv
-            .select("div.links > a")
-            .firstOrNull { it.ownText() == "Magnet" }
-            ?.attr("href")
-            ?: return null
+
+        val links = entryDiv.selectFirst("div.links") ?: return null
+        val fileDownloadLink = links.selectFirst("a.dllink")?.attr("href")
+        val magnetUri = links.selectFirst("""a[href^="magnet:"]""")?.attr("href") ?: return null
 
         return Torrent(
             name = name,
@@ -64,6 +63,7 @@ class AnimeTosho : SearchProvider {
             category = info.specializedCategory,
             descriptionPageUrl = descriptionPageUrl,
             infoHashOrMagnetUri = InfoHashOrMagnetUri.MagnetUri(magnetUri),
+            fileDownloadLink = fileDownloadLink,
         )
     }
 

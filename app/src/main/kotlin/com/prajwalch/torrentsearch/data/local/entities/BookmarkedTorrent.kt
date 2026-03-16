@@ -1,5 +1,6 @@
 package com.prajwalch.torrentsearch.data.local.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -7,6 +8,7 @@ import androidx.room.PrimaryKey
 import com.prajwalch.torrentsearch.domain.models.Category
 import com.prajwalch.torrentsearch.domain.models.InfoHashOrMagnetUri
 import com.prajwalch.torrentsearch.domain.models.Torrent
+
 import kotlinx.serialization.Serializable
 
 @Entity(
@@ -26,6 +28,8 @@ data class BookmarkedTorrent(
     val category: String,
     val descriptionPageUrl: String,
     val magnetUri: String,
+    @ColumnInfo(defaultValue = "NULL")
+    val fileDownloadLink: String? = null,
 )
 
 fun BookmarkedTorrent.toDomain() =
@@ -44,6 +48,7 @@ fun BookmarkedTorrent.toDomain() =
         },
         descriptionPageUrl = this.descriptionPageUrl,
         infoHashOrMagnetUri = InfoHashOrMagnetUri.MagnetUri(uri = this.magnetUri),
+        fileDownloadLink = this.fileDownloadLink,
     )
 
 fun Torrent.toEntity() =
@@ -58,6 +63,7 @@ fun Torrent.toEntity() =
         category = this.category?.name ?: "",
         descriptionPageUrl = this.descriptionPageUrl,
         magnetUri = this.magnetUri(),
+        fileDownloadLink = this.fileDownloadLink,
     )
 
 fun List<BookmarkedTorrent>.toDomain() = this.map { it.toDomain() }

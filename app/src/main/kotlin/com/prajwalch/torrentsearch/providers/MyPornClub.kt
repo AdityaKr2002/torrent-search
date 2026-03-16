@@ -45,7 +45,10 @@ class MyPornClub : SearchProvider {
         val relativeDetailsUrl = anchor.attr("href")
         val descriptionPageUrl = info.url + relativeDetailsUrl
 
-        val infoHash = extractInfoHash(descriptionPageUrl, context) ?: return null
+        val (magnetLink, fileDownloadLink) = extractMagnetUriAndFileDownloadLink(
+            descriptionPageUrl = descriptionPageUrl,
+            context = context,
+        ) ?: return null
 
         val size = row.select("div.torrent_element_info span").getOrNull(3)?.text().orEmpty()
         val seeders = row
@@ -72,23 +75,25 @@ class MyPornClub : SearchProvider {
             uploadDate = uploadDate,
             category = info.specializedCategory,
             descriptionPageUrl = descriptionPageUrl,
-            infoHashOrMagnetUri = InfoHashOrMagnetUri.InfoHash(infoHash)
+            infoHashOrMagnetUri = InfoHashOrMagnetUri.MagnetUri(uri = magnetLink),
+            fileDownloadLink = fileDownloadLink,
         )
     }
 
 
-    /** Extracts the info hash from the description page. */
-    private suspend fun extractInfoHash(
+    /** Extracts magnet URI and file download link from the description page. */
+    private suspend fun extractMagnetUriAndFileDownloadLink(
         descriptionPageUrl: String,
         context: SearchContext,
-    ): String? {
+    ): Pair<String, String?>? {
         val html = context.httpClient.get(descriptionPageUrl)
-        val infoDiv = Jsoup.parse(html).selectFirst("div.torrent_info_div > div") ?: return null
+        val linksDiv = Jsoup.parse(html).selectFirst("div.torrent_download_div") ?: return null
 
-        // Example: [hash_info]:9b3efb2a550d42aff3e8ab1bb415e05535e440a9
-        val text = infoDiv.ownText().trim()
+        val fileDownloadLink =
+            linksDiv.selectFirst("a:nth-child(1)")?.attr("href")?.let { "https:$it" }
+        val magnetLink = linksDiv.selectFirst("a:nth-child(2)")?.attr("href") ?: return null
 
-        return HASH_REGEX.find(text)?.groupValues?.getOrNull(1)
+        return Pair(magnetLink, fileDownloadLink)
     }
 
     private companion object {

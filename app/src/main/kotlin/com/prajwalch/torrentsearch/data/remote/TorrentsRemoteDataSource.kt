@@ -10,16 +10,29 @@ import com.prajwalch.torrentsearch.network.HttpClient
 import com.prajwalch.torrentsearch.providers.SearchContext
 import com.prajwalch.torrentsearch.providers.SearchProvider
 
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.utils.io.readRemaining
+
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.io.readByteArray
 
 import javax.inject.Inject
 
 class TorrentsRemoteDataSource @Inject constructor(
     private val httpClient: HttpClient,
 ) {
+    suspend fun downloadTorrentFile(url: String) = withContext(Dispatchers.IO) {
+        val response = httpClient.getResponse(url = url)
+        val bodyChannel = response.bodyAsChannel()
+
+        bodyChannel.readRemaining().readByteArray()
+    }
+
     fun searchTorrents(
         query: String,
         category: Category,

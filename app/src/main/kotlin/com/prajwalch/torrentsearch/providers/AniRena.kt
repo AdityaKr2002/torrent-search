@@ -52,6 +52,9 @@ class AniRena : SearchProvider {
             .selectFirst("td.torrents_small_info_data1 > div:nth-child(1) > a")
             ?.ownText()
             ?: return null
+        val fileDownloadLink = tr
+            .selectFirst("td.torrents_small_info_data2 > div > a:nth-child(1)")
+            ?.attr("href")
         val magnetUri = tr
             .selectFirst("td.torrents_small_info_data2 > div > a:nth-child(2)")
             ?.attr("href")
@@ -94,6 +97,7 @@ class AniRena : SearchProvider {
             providerName = info.name,
             descriptionPageUrl = "",
             infoHashOrMagnetUri = magnetUri,
+            fileDownloadLink = fileDownloadLink,
         )
     }
 

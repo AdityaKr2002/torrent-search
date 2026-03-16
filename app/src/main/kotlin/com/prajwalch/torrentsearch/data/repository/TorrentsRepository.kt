@@ -18,6 +18,8 @@ import javax.inject.Inject
 class TorrentsRepository @Inject constructor(
     private val remoteDataSource: TorrentsRemoteDataSource,
 ) {
+    private val torrentFilesCache = mutableMapOf<String, ByteArray>()
+
     fun search(
         query: String,
         category: Category,
@@ -52,6 +54,12 @@ class TorrentsRepository @Inject constructor(
             torrents
         } else {
             torrents.filter { it.category == category }
+        }
+    }
+
+    suspend fun downloadTorrentFile(url: String): ByteArray {
+        return torrentFilesCache.getOrPut(url) {
+            remoteDataSource.downloadTorrentFile(url = url)
         }
     }
 }

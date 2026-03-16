@@ -28,6 +28,11 @@ data class Torrent(
      * Either of them is required for download functionality but not both.
      */
     private val infoHashOrMagnetUri: InfoHashOrMagnetUri,
+
+    /**
+     * A URL from where .torrent file can be downloaded.
+     */
+    val fileDownloadLink: String? = null,
 ) {
     /** Returns `true` if this torrent is NSFW (Not Safe For Work). */
     fun isNSFW() = category?.isNSFW ?: true

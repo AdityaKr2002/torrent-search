@@ -163,7 +163,7 @@ class TheRarBg : SearchProvider {
         httpClient: HttpClient,
     ): Torrent? {
         // 1. Get the info hash from the details page.
-        val infoHash = extractInfoHash(
+        val (magnetUri, fileDownloadLink) = extractMagnetUriAndFileDownloadLink(
             httpClient = httpClient,
             detailsPageUrl = parsedResult.detailsPageUrl,
         ) ?: return null
@@ -179,16 +179,26 @@ class TheRarBg : SearchProvider {
             uploadDate = parsedResult.uploadDate,
             category = category,
             descriptionPageUrl = parsedResult.detailsPageUrl,
-            infoHashOrMagnetUri = InfoHashOrMagnetUri.InfoHash(infoHash),
+            infoHashOrMagnetUri = InfoHashOrMagnetUri.MagnetUri(magnetUri),
+            fileDownloadLink = fileDownloadLink,
         )
     }
 
     /** Extracts and returns the info hash from the details page, if exists. */
-    private suspend fun extractInfoHash(httpClient: HttpClient, detailsPageUrl: String): String? {
+    private suspend fun extractMagnetUriAndFileDownloadLink(
+        httpClient: HttpClient,
+        detailsPageUrl: String,
+    ): Pair<String, String?>? {
         val detailsPageHtml = httpClient.get(url = detailsPageUrl)
 
         return withContext(Dispatchers.Default) {
-            Jsoup.parse(detailsPageHtml).selectFirst(".info-hash-value")?.ownText()
+            val html = Jsoup.parse(detailsPageHtml) ?: return@withContext null
+
+            val magnetUri = html.selectFirst("a.magnet-btn")?.attr("href")
+                ?: return@withContext null
+            val fileDownloadLink = html.selectFirst("a.torrent-btn")?.attr("href")
+
+            Pair(magnetUri, fileDownloadLink)
         }
     }
 

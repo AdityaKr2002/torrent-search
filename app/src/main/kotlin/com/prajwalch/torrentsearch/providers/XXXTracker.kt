@@ -50,6 +50,8 @@ class XXXTracker : SearchProvider {
 
         val secondTd = tr.selectFirst("td:nth-child(2)") ?: return null
         val magnetUri = secondTd.selectFirst("a:nth-child(1)")?.attr("href") ?: return null
+        val fileDownloadLink =
+            secondTd.selectFirst("a:nth-child(2)")?.attr("href")?.let { "${info.url}$it" }
 
         val nameHref = secondTd.selectFirst("a:nth-child(3)") ?: return null
         val name = nameHref.ownText()
@@ -71,6 +73,7 @@ class XXXTracker : SearchProvider {
             descriptionPageUrl = descriptionPageUrl,
             providerName = info.name,
             infoHashOrMagnetUri = InfoHashOrMagnetUri.MagnetUri(magnetUri),
+            fileDownloadLink = fileDownloadLink,
         )
     }
 }

@@ -56,8 +56,8 @@ class XXXClub : SearchProvider {
         val seeders = li.selectFirst("span.see")?.ownText() ?: return null
         val peers = li.selectFirst("span.lee")?.ownText() ?: return null
 
-        val magnetUri = withContext(Dispatchers.IO) {
-            extractMagnetUri(
+        val (magnetUri, fileDownloadLink) = withContext(Dispatchers.IO) {
+            extractMagnetUriAndFileDownloadLink(
                 httpClient = httpClient,
                 descriptionPageUrl = descriptionPageUrl,
             )
@@ -73,6 +73,7 @@ class XXXClub : SearchProvider {
             category = info.specializedCategory,
             descriptionPageUrl = descriptionPageUrl,
             infoHashOrMagnetUri = InfoHashOrMagnetUri.MagnetUri(magnetUri),
+            fileDownloadLink = fileDownloadLink,
         )
     }
 
@@ -85,15 +86,20 @@ class XXXClub : SearchProvider {
         return raw.substring(0..lastSpaceIndex).trim()
     }
 
-    private suspend fun extractMagnetUri(
+    private suspend fun extractMagnetUriAndFileDownloadLink(
         httpClient: HttpClient,
         descriptionPageUrl: String,
-    ): String? {
+    ): Pair<String, String?>? {
         val responseHtml = httpClient.get(url = descriptionPageUrl)
 
-        return Jsoup
-            .parse(responseHtml)
-            .selectFirst("a.mg-link")
-            ?.attr("href")
+        return withContext(Dispatchers.Default) {
+            val html = Jsoup.parse(responseHtml) ?: return@withContext null
+            val magnetUri = html.selectFirst("""a[href^="magnet:"]""")?.attr("href")
+                ?: return@withContext null
+            val fileDownloadLink =
+                html.selectFirst("""a[href^="/torrents/download"]""")?.attr("href")
+
+            Pair(magnetUri, fileDownloadLink)
+        }
     }
 }

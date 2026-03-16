@@ -24,7 +24,7 @@ import com.prajwalch.torrentsearch.data.local.entities.TorznabConfigEntity
         SearchHistoryEntity::class,
         TorznabConfigEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
@@ -33,6 +33,7 @@ import com.prajwalch.torrentsearch.data.local.entities.TorznabConfigEntity
             to = 3,
             spec = TorrentSearchDatabase.Migration2To3Spec::class,
         ),
+        AutoMigration(from = 3, to = 4),
     ],
 )
 abstract class TorrentSearchDatabase : RoomDatabase() {
