@@ -80,16 +80,19 @@ class SearchViewModel @Inject constructor(
     private val searchHistoryRepository: SearchHistoryRepository,
     private val settingsRepository: SettingsRepository,
     private val connectivityChecker: ConnectivityChecker,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     /** Current search query. */
-    private val searchQuery = savedStateHandle.get<String>("query")!!
+    private val searchQuery = savedStateHandle.get<String>("query")
+        ?: error("SearchViewModel can't function without a search query")
 
     /** Current search category. */
-    private var searchCategory = Category.All
+    private val searchCategory = savedStateHandle.get<Category>("category") ?: Category.All
 
     /** The internal or mutable UI state. */
-    private val _uiState = MutableStateFlow(SearchUiState(searchQuery = searchQuery))
+    private val _uiState = MutableStateFlow(
+        SearchUiState(searchQuery = searchQuery, searchCategory = searchCategory)
+    )
 
     /**
      * Query used to filter search results.
@@ -127,14 +130,7 @@ class SearchViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch {
-            val savedCategory = savedStateHandle.get<Category>("category")
-
-            searchCategory = savedCategory ?: settingsRepository.defaultCategory.first()
-            _uiState.update { it.copy(searchCategory = searchCategory) }
-
-            load()
-        }
+        searchJob = viewModelScope.launch { load() }
     }
 
     /** Produces UI state from the given internal state and other parameters. */
@@ -212,8 +208,8 @@ class SearchViewModel @Inject constructor(
     private suspend fun load() {
         _uiState.update {
             SearchUiState(
-                searchQuery = it.searchQuery,
-                searchCategory = it.searchCategory,
+                searchQuery = searchQuery,
+                searchCategory = searchCategory,
                 isLoading = true,
             )
         }

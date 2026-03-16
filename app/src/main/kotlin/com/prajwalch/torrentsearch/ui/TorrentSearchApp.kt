@@ -31,7 +31,7 @@ private object Home
 @Serializable
 private data class Search(
     val query: String,
-    val category: Category? = null,
+    val category: Category = Category.All,
 )
 
 @Serializable
