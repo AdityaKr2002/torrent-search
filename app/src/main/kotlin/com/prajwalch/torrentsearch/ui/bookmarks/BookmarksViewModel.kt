@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 
 import com.prajwalch.torrentsearch.data.repository.BookmarksRepository
 import com.prajwalch.torrentsearch.data.repository.SettingsRepository
-import com.prajwalch.torrentsearch.data.repository.TorrentsRepository
 import com.prajwalch.torrentsearch.domain.models.SortCriteria
 import com.prajwalch.torrentsearch.domain.models.SortOptions
 import com.prajwalch.torrentsearch.domain.models.SortOrder
@@ -40,7 +39,6 @@ data class BookmarksUiState(
 @HiltViewModel
 class BookmarksViewModel @Inject constructor(
     private val bookmarksRepository: BookmarksRepository,
-    private val torrentsRepository: TorrentsRepository,
     private val settingsRepository: SettingsRepository,
     private val torrentFileDownloader: TorrentFileDownloader,
 ) : ViewModel() {
@@ -70,8 +68,6 @@ class BookmarksViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5.seconds),
         initialValue = BookmarksUiState(),
     )
-
-    private var downloadedTorrentFileContent: ByteArray? = null
 
     /** Deletes the given bookmarked torrent. */
     fun deleteBookmarkedTorrent(torrent: Torrent) {
