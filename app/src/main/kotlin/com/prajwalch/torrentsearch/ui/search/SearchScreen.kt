@@ -1,7 +1,5 @@
 package com.prajwalch.torrentsearch.ui.search
 
-import android.content.ContentResolver
-
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -38,7 +36,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -47,7 +44,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +56,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -73,8 +68,8 @@ import com.prajwalch.torrentsearch.domain.models.Category
 import com.prajwalch.torrentsearch.domain.models.MagnetUri
 import com.prajwalch.torrentsearch.domain.models.SearchException
 import com.prajwalch.torrentsearch.domain.models.Torrent
-import com.prajwalch.torrentsearch.domain.models.TorrentFileDownloadState
 import com.prajwalch.torrentsearch.extensions.copyText
+import com.prajwalch.torrentsearch.ui.TorrentFileDownloadEffect
 import com.prajwalch.torrentsearch.ui.components.AnimatedScrollToTopFAB
 import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
 import com.prajwalch.torrentsearch.ui.components.BottomInfo
@@ -89,7 +84,6 @@ import com.prajwalch.torrentsearch.ui.components.StackTraceCard
 import com.prajwalch.torrentsearch.ui.components.TorrentActionsBottomSheet
 import com.prajwalch.torrentsearch.ui.components.TorrentListItem
 import com.prajwalch.torrentsearch.ui.components.rememberCollapsibleSearchBarState
-import com.prajwalch.torrentsearch.ui.rememberCreateTorrentFileLauncher
 import com.prajwalch.torrentsearch.ui.rememberTorrentListState
 import com.prajwalch.torrentsearch.ui.theme.TorrentSearchTheme
 import com.prajwalch.torrentsearch.ui.theme.spaces
@@ -112,8 +106,8 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val torrentFileDownloadState by viewModel.torrentFileDownloadState.collectAsStateWithLifecycle()
 
-    val contentResolver: ContentResolver? = LocalContext.current.contentResolver
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val torrentListState = rememberTorrentListState(
@@ -179,29 +173,6 @@ fun SearchScreen(
             },
             enableDescriptionPageActions = torrent.descriptionPageUrl.isNotEmpty(),
         )
-    }
-
-    val createTorrentFileLauncher = rememberCreateTorrentFileLauncher { fileUri ->
-        if (fileUri != null && contentResolver != null) {
-            viewModel.writeTorrentFile(fileUri = fileUri, contentResolver = contentResolver)
-        }
-        viewModel.clearDownloadedTorrentFile()
-    }
-
-    LaunchedEffect(uiState.torrentFileDownloadState) {
-        when (val downloadState = uiState.torrentFileDownloadState) {
-            is TorrentFileDownloadState.Downloading -> {
-                snackbarHostState.showSnackbar(
-                    message = "Downloading .torrent file",
-                    duration = SnackbarDuration.Indefinite,
-                )
-            }
-
-            is TorrentFileDownloadState.Empty -> {}
-            is TorrentFileDownloadState.Success -> {
-                createTorrentFileLauncher.launch(downloadState.fileName)
-            }
-        }
     }
 
     var showSearchFailures by rememberSaveable { mutableStateOf(false) }
@@ -310,6 +281,13 @@ fun SearchScreen(
             }
         }
     }
+
+    TorrentFileDownloadEffect(
+        onWrite = viewModel::writeTorrentFile,
+        state = torrentFileDownloadState,
+        events = viewModel.torrentFileDownloadEvents,
+        snackbarHostState = snackbarHostState,
+    )
 
     Scaffold(
         modifier = Modifier

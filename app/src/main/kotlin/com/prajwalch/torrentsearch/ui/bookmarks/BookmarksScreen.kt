@@ -22,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SwipeToDismissBox
@@ -33,7 +32,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,8 +57,8 @@ import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.constants.TorrentSearchConstants
 import com.prajwalch.torrentsearch.domain.models.MagnetUri
 import com.prajwalch.torrentsearch.domain.models.Torrent
-import com.prajwalch.torrentsearch.domain.models.TorrentFileDownloadState
 import com.prajwalch.torrentsearch.extensions.copyText
+import com.prajwalch.torrentsearch.ui.TorrentFileDownloadEffect
 import com.prajwalch.torrentsearch.ui.components.AnimatedScrollToTopFAB
 import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
 import com.prajwalch.torrentsearch.ui.components.CollapsibleSearchBar
@@ -74,7 +72,6 @@ import com.prajwalch.torrentsearch.ui.components.SortIconButton
 import com.prajwalch.torrentsearch.ui.components.TorrentActionsBottomSheet
 import com.prajwalch.torrentsearch.ui.components.TorrentListItem
 import com.prajwalch.torrentsearch.ui.components.rememberCollapsibleSearchBarState
-import com.prajwalch.torrentsearch.ui.rememberCreateTorrentFileLauncher
 import com.prajwalch.torrentsearch.ui.rememberTorrentListState
 import com.prajwalch.torrentsearch.ui.theme.spaces
 
@@ -100,6 +97,7 @@ fun BookmarksScreen(
     viewModel: BookmarksViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val torrentFileDownloadState by viewModel.torrentFileDownloadState.collectAsStateWithLifecycle()
 
     val contentResolver = LocalContext.current.contentResolver
     val bookmarksExportedFileChooser = rememberLauncherForActivityResult(
@@ -174,29 +172,6 @@ fun BookmarksScreen(
             },
             enableDescriptionPageActions = bookmark.descriptionPageUrl.isNotEmpty(),
         )
-    }
-
-    val createTorrentFileLauncher = rememberCreateTorrentFileLauncher { fileUri ->
-        if (fileUri != null && contentResolver != null) {
-            viewModel.writeTorrentFile(fileUri = fileUri, contentResolver = contentResolver)
-        }
-        viewModel.clearDownloadedTorrentFile()
-    }
-
-    LaunchedEffect(uiState.torrentFileDownloadState) {
-        when (val downloadState = uiState.torrentFileDownloadState) {
-            is TorrentFileDownloadState.Downloading -> {
-                snackbarHostState.showSnackbar(
-                    message = "Downloading .torrent file",
-                    duration = SnackbarDuration.Indefinite,
-                )
-            }
-
-            is TorrentFileDownloadState.Empty -> {}
-            is TorrentFileDownloadState.Success -> {
-                createTorrentFileLauncher.launch(downloadState.fileName)
-            }
-        }
     }
 
     var showDeleteAllConfirmationDialog by rememberSaveable { mutableStateOf(false) }
@@ -285,6 +260,13 @@ fun BookmarksScreen(
             )
         }
     }
+
+    TorrentFileDownloadEffect(
+        onWrite = viewModel::writeTorrentFile,
+        state = torrentFileDownloadState,
+        events = viewModel.torrentFileDownloadEvents,
+        snackbarHostState = snackbarHostState,
+    )
 
     Scaffold(
         modifier = Modifier

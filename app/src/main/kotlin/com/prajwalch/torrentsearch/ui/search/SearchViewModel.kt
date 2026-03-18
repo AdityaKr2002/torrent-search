@@ -1,8 +1,5 @@
 package com.prajwalch.torrentsearch.ui.search
 
-import android.content.ContentResolver
-import android.net.Uri
-
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.prajwalch.torrentsearch.data.repository.BookmarksRepository
 import com.prajwalch.torrentsearch.data.repository.SearchHistoryRepository
 import com.prajwalch.torrentsearch.data.repository.SettingsRepository
-import com.prajwalch.torrentsearch.data.repository.TorrentsRepository
 import com.prajwalch.torrentsearch.domain.SearchTorrentsUseCase
 import com.prajwalch.torrentsearch.domain.models.Category
 import com.prajwalch.torrentsearch.domain.models.SearchResults
@@ -18,8 +14,9 @@ import com.prajwalch.torrentsearch.domain.models.SortCriteria
 import com.prajwalch.torrentsearch.domain.models.SortOptions
 import com.prajwalch.torrentsearch.domain.models.SortOrder
 import com.prajwalch.torrentsearch.domain.models.Torrent
-import com.prajwalch.torrentsearch.domain.models.TorrentFileDownloadState
 import com.prajwalch.torrentsearch.network.ConnectivityChecker
+import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloadState
+import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloader
 import com.prajwalch.torrentsearch.utils.createSortComparator
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,7 +40,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 import java.io.OutputStream
 import javax.inject.Inject
@@ -79,11 +75,11 @@ data class SearchProviderFilterOption(
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchTorrentsUseCase: SearchTorrentsUseCase,
-    private val torrentsRepository: TorrentsRepository,
     private val bookmarksRepository: BookmarksRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
     private val settingsRepository: SettingsRepository,
     private val connectivityChecker: ConnectivityChecker,
+    private val torrentFileDownloader: TorrentFileDownloader,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val searchQuery = savedStateHandle.get<String>("query")
@@ -98,15 +94,14 @@ class SearchViewModel @Inject constructor(
         searchResults = searchOrchestrator.searchResults,
         settingsRepository = settingsRepository,
     )
-    private val torrentFileDownloader = TorrentFileDownloader(
-        torrentsRepository = torrentsRepository,
-    )
+
+    val torrentFileDownloadState = torrentFileDownloader.state
+    val torrentFileDownloadEvents = torrentFileDownloader.events
 
     val uiState = combine(
         searchOrchestrator.state,
-        searchResultsProcessor.state,
-        torrentFileDownloader.state,
-    ) { searchState, processedState, torrentFileDownloadState ->
+        searchResultsProcessor.state
+    ) { searchState, processedState ->
         val resultsFilteredOut = when {
             searchState.isSearching -> false
             searchState.isRefreshing -> false
@@ -120,7 +115,6 @@ class SearchViewModel @Inject constructor(
             searchResults = processedState.results,
             sortOptions = processedState.sortOptions,
             filterOptions = processedState.filterOptions,
-            torrentFileDownloadState = torrentFileDownloadState,
             isLoading = searchState.isLoading,
             isSearching = searchState.isSearching,
             isRefreshing = searchState.isRefreshing,
@@ -188,22 +182,17 @@ class SearchViewModel @Inject constructor(
 
     fun downloadTorrentFile(url: String, fileName: String) {
         viewModelScope.launch {
-            torrentFileDownloader.download(url = url, fileName = fileName)
+            torrentFileDownloader.downloadFile(url = url, fileName = fileName)
         }
     }
 
-    fun writeTorrentFile(fileUri: Uri, contentResolver: ContentResolver) {
+    fun writeTorrentFile(outputStream: OutputStream) {
         viewModelScope.launch {
-            val outputStream = contentResolver.openOutputStream(fileUri) ?: return@launch
-            torrentFileDownloader.writeDownloadedContent(outputStream = outputStream)
+            torrentFileDownloader.writeFile(outputStream = outputStream)
         }
     }
 
-    fun clearDownloadedTorrentFile() {
-        torrentFileDownloader.resetEverything()
-    }
-
-//    /** Creates search providers filter option from the given search results. */
+    //    /** Creates search providers filter option from the given search results. */
 //    private fun createSearchProvidersFilterOption(
 //        searchResults: ImmutableList<Torrent>,
 //    ): ImmutableList<SearchProviderFilterOption> {
@@ -493,36 +482,5 @@ private class SearchResultsProcessor(
      */
     fun updateSortOrder(order: SortOrder) {
         sortOptions.update { it.copy(order = order) }
-    }
-}
-
-private class TorrentFileDownloader(
-    private val torrentsRepository: TorrentsRepository,
-) {
-    private val _state = MutableStateFlow<TorrentFileDownloadState>(TorrentFileDownloadState.Empty)
-    val state = _state.asStateFlow()
-
-    private var downloadedContent: ByteArray? = null
-
-    suspend fun download(url: String, fileName: String) {
-        _state.value = TorrentFileDownloadState.Downloading
-        downloadedContent = torrentsRepository.downloadTorrentFile(url)
-        _state.value = TorrentFileDownloadState.Success(fileName)
-    }
-
-    suspend fun writeDownloadedContent(outputStream: OutputStream) = withContext(Dispatchers.IO) {
-        val content = downloadedContent
-        if (content == null) {
-            outputStream.close()
-            return@withContext
-        }
-
-        outputStream.use { it.write(content) }
-        resetEverything()
-    }
-
-    fun resetEverything() {
-        _state.value = TorrentFileDownloadState.Empty
-        downloadedContent = null
     }
 }

@@ -1,8 +1,5 @@
 package com.prajwalch.torrentsearch.ui.bookmarks
 
-import android.content.ContentResolver
-import android.net.Uri
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
@@ -14,18 +11,17 @@ import com.prajwalch.torrentsearch.domain.models.SortOptions
 import com.prajwalch.torrentsearch.domain.models.SortOrder
 import com.prajwalch.torrentsearch.domain.models.Torrent
 import com.prajwalch.torrentsearch.domain.models.TorrentFileDownloadState
+import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloader
 import com.prajwalch.torrentsearch.utils.createSortComparator
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 import java.io.InputStream
 import java.io.OutputStream
@@ -46,18 +42,18 @@ class BookmarksViewModel @Inject constructor(
     private val bookmarksRepository: BookmarksRepository,
     private val torrentsRepository: TorrentsRepository,
     private val settingsRepository: SettingsRepository,
+    private val torrentFileDownloader: TorrentFileDownloader,
 ) : ViewModel() {
     private val filterQuery = MutableStateFlow("")
-    private val torrentFileDownloadState =
-        MutableStateFlow<TorrentFileDownloadState>(TorrentFileDownloadState.Empty)
 
+    val torrentFileDownloadState = torrentFileDownloader.state
+    val torrentFileDownloadEvents = torrentFileDownloader.events
     val uiState = combine(
         filterQuery,
-        torrentFileDownloadState,
         bookmarksRepository.observeAllBookmarks(),
         settingsRepository.enableNSFWMode,
         settingsRepository.bookmarksSortOptions,
-    ) { filterQuery, torrentFileDownloadState, bookmarks, nsfwModeEnabled, sortOptions ->
+    ) { filterQuery, bookmarks, nsfwModeEnabled, sortOptions ->
         val bookmarks = bookmarks
             .filter { nsfwModeEnabled || !it.isNSFW() }
             .filter { filterQuery.isBlank() || it.name.contains(filterQuery, ignoreCase = true) }
@@ -68,7 +64,6 @@ class BookmarksViewModel @Inject constructor(
         BookmarksUiState(
             bookmarks = bookmarks,
             sortOptions = sortOptions,
-            torrentFileDownloadState = torrentFileDownloadState,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -126,29 +121,14 @@ class BookmarksViewModel @Inject constructor(
     }
 
     fun downloadTorrentFile(url: String, fileName: String) {
-        torrentFileDownloadState.value = TorrentFileDownloadState.Downloading
-
         viewModelScope.launch {
-            val content = torrentsRepository.downloadTorrentFile(url = url)
-            downloadedTorrentFileContent = content
-            torrentFileDownloadState.value = TorrentFileDownloadState.Success(fileName)
+            torrentFileDownloader.downloadFile(url = url, fileName = fileName)
         }
     }
 
-    fun writeTorrentFile(fileUri: Uri, contentResolver: ContentResolver) {
-        val content = downloadedTorrentFileContent ?: return
-
+    fun writeTorrentFile(outputStream: OutputStream) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val outputStream = contentResolver.openOutputStream(fileUri) ?: return@withContext
-                outputStream.use { it.write(content) }
-            }
-            downloadedTorrentFileContent = null
+            torrentFileDownloader.writeFile(outputStream)
         }
-    }
-
-    fun clearDownloadedTorrentFile() {
-        torrentFileDownloadState.value = TorrentFileDownloadState.Empty
-        downloadedTorrentFileContent = null
     }
 }
