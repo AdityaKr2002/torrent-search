@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.ui.theme.spaces
@@ -135,6 +136,8 @@ private fun TorrentActionsBottomSheetHeader(
         if (isNSFW) NSFWBadge()
         Text(
             text = title,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 3,
             style = MaterialTheme.typography.bodyLarge,
         )
     }
