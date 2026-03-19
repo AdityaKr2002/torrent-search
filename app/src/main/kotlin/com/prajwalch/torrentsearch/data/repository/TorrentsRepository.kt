@@ -24,8 +24,7 @@ typealias TorrentFileId = UUID
 class TorrentsRepository @Inject constructor(
     private val remoteDataSource: TorrentsRemoteDataSource,
 ) {
-    private val torrentFilesCache = mutableMapOf<String, ByteArray>()
-    private val torrentFilesCache2 = mutableMapOf<TorrentFileId, ByteArray>()
+    private val torrentFileContentCache = mutableMapOf<TorrentFileId, ByteArray>()
 
     fun search(
         query: String,
@@ -66,10 +65,10 @@ class TorrentsRepository @Inject constructor(
 
     suspend fun downloadTorrentFile(url: String): TorrentFileId {
         val id = UUID.nameUUIDFromBytes(url.toByteArray())
-        if (torrentFilesCache2.containsKey(id)) return id
+        if (torrentFileContentCache.containsKey(id)) return id
 
         val fileContent = remoteDataSource.downloadTorrentFile(url = url)
-        torrentFilesCache2[id] = fileContent
+        torrentFileContentCache[id] = fileContent
 
         return id
     }
@@ -78,7 +77,7 @@ class TorrentsRepository @Inject constructor(
         fileId: TorrentFileId,
         outputStream: OutputStream,
     ) = withContext(Dispatchers.IO) {
-        val fileContent = torrentFilesCache2[fileId]
+        val fileContent = torrentFileContentCache[fileId]
         fileContent?.let(outputStream::write)
     }
 }
