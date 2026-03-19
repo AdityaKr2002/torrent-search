@@ -50,7 +50,7 @@ class SearchProvidersViewModel @Inject constructor(
 
     val uiState = combine(
         selectedCategory,
-        searchProvidersRepository.observeSearchProvidersInfo(),
+        searchProvidersRepository.getSearchProvidersInfo(),
         settingsRepository.enabledSearchProvidersId,
         ::createUiState,
     ).stateIn(
@@ -108,7 +108,7 @@ class SearchProvidersViewModel @Inject constructor(
     fun enableAllSearchProviders() {
         viewModelScope.launch {
             val allSearchProvidersId = searchProvidersRepository
-                .observeSearchProvidersInfo()
+                .getSearchProvidersInfo()
                 .map { infos -> infos.map { it.id } }
                 .firstOrNull()
                 ?: return@launch
@@ -132,7 +132,7 @@ class SearchProvidersViewModel @Inject constructor(
     fun resetEnabledSearchProvidersToDefault() {
         viewModelScope.launch {
             settingsRepository.setEnabledSearchProvidersId(
-                providersId = searchProvidersRepository.getEnabledSearchProvidersId(),
+                providersId = searchProvidersRepository.getDefaultSearchProvidersId(),
             )
         }
     }

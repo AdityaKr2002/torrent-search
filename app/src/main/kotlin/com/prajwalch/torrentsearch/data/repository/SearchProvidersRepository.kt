@@ -37,10 +37,8 @@ import com.prajwalch.torrentsearch.providers.XXXTracker
 import com.prajwalch.torrentsearch.providers.Yts
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 
 import java.util.UUID
 
@@ -78,67 +76,48 @@ class SearchProvidersRepository @Inject constructor(
         Yts(),
     )
 
-    // TODO: Remove this or handle enabled by default search providers properly.
-    fun getEnabledSearchProvidersId(): Set<SearchProviderId> {
+    suspend fun getSearchProvidersByCategory(category: Category): List<SearchProvider> {
+        val searchProviders = getSearchProviders().toList().flatten()
+
+        return if (category == Category.All) {
+            searchProviders
+        } else {
+            searchProviders.filterByCategory(category)
+        }
+    }
+
+    fun getSearchProviders(): Flow<List<SearchProvider>> {
+        return torznabConfigDao.getAllConfigs()
+            .map { configEntities ->
+                configEntities.map {
+                    TorznabSearchProvider(id = it.searchProviderId, config = it.toDomain())
+                }
+            }
+            .map { torznabProvidersInstance -> builtins + torznabProvidersInstance }
+    }
+
+    private fun List<SearchProvider>.filterByCategory(category: Category) = this.filter {
+        val specializedCategory = it.info.specializedCategory
+        (specializedCategory == Category.All) || (category == specializedCategory)
+    }
+
+    fun getDefaultSearchProvidersId(): Set<SearchProviderId> {
         return builtins.filter { it.info.enabledByDefault }.map { it.info.id }.toSet()
     }
 
-    fun observeSearchProvidersInfo(): Flow<List<SearchProviderInfo>> {
-        val builtinSearchProvidersInfoFlow = flowOf(builtins.map { it.info })
-        val torznabSearchProvidersInfoFlow = torznabConfigDao.getAllConfigs().map {
-            it.toSearchProviderInfo()
-        }
+    fun getSearchProvidersInfo(): Flow<List<SearchProviderInfo>> {
+        val builtinProvidersInfo = builtins.map { it.info }
 
-        return combine(
-            builtinSearchProvidersInfoFlow,
-            torznabSearchProvidersInfoFlow
-        ) { builtinInfos, torznabInfos ->
-            builtinInfos + torznabInfos
-        }.map { infos ->
-            infos.sortedBy { it.name }
-        }
+        return torznabConfigDao.getAllConfigs()
+            .map { configEntities -> configEntities.toSearchProviderInfo() }
+            .map { torznabProvidersInfo -> builtinProvidersInfo + torznabProvidersInfo }
+            // TODO: Remove this. Sorting is not the concern of repository.
+            .map { searchProviderInfos -> searchProviderInfos.sortedBy { it.name } }
     }
 
-    fun observeSearchProvidersCount(): Flow<Int> {
-        return torznabConfigDao.getConfigsCount().map { it + builtins.size }
-    }
-
-    suspend fun getSearchProvidersInstance(category: Category): List<SearchProvider> {
-        val searchProviders = getSearchProvidersInstance()
-
-        if (category == Category.All) {
-            return searchProviders
-        }
-
-        return searchProviders.filter {
-            // NOTE: Currently, if the search provider's specialized is set to
-            //       `All` we can't surely know whether the underlying server
-            //       supports setting specific category or not.
-            //
-            //       For example: TorrentCSV does allow to search any type of
-            //       torrent but it doesn't support setting specific category
-            //       explicitly. Meaning, we can't ask it to search torrents
-            //       of specific category.
-            //
-            //       To address this issue, force each and every search provider
-            //       to list out all categories they allow or support to set
-            //       explicitly instead of single `specializedCategory`.
-            (it.info.specializedCategory == Category.All) || (category == it.info.specializedCategory)
-        }
-    }
-
-    suspend fun getSearchProvidersInstance(): List<SearchProvider> {
-        val builtinSearchProvidersFlow = flowOf(builtins)
-        val torznabSearchProvidersFlow = torznabConfigDao.getAllConfigs().map { entities ->
-            entities.map { TorznabSearchProvider(id = it.searchProviderId, config = it.toDomain()) }
-        }
-
-        return combine(
-            builtinSearchProvidersFlow,
-            torznabSearchProvidersFlow,
-        ) { builtins, externals ->
-            builtins + externals
-        }.firstOrNull().orEmpty()
+    fun getSearchProvidersCount(): Flow<Int> {
+        return torznabConfigDao.getConfigsCount()
+            .map { torznabProvidersCount -> builtins.size + torznabProvidersCount }
     }
 
     suspend fun checkTorznabConnection(url: String, apiKey: String): TorznabConnectionCheckResult {

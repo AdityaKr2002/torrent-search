@@ -45,7 +45,7 @@ class SettingsRepository @Inject constructor(
     val enabledSearchProvidersId: Flow<Set<SearchProviderId>> = dataStore
         .getOrDefault(
             key = ENABLED_SEARCH_PROVIDERS_ID,
-            default = searchProvidersRepository.getEnabledSearchProvidersId(),
+            default = searchProvidersRepository.getDefaultSearchProvidersId(),
         )
 
     val defaultCategory: Flow<Category> = dataStore

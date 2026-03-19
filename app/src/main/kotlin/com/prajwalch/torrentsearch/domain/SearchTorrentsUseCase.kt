@@ -61,11 +61,11 @@ class SearchTorrentsUseCase @Inject constructor(
     }
 
     private suspend fun getEnabledSearchProviders(category: Category): List<SearchProvider> {
-        val searchProviders = searchProvidersRepository
-            .getSearchProvidersInstance(category = category)
         val enabledSearchProvidersId = settingsRepository.enabledSearchProvidersId.first()
 
-        return searchProviders.filter { it.info.id in enabledSearchProvidersId }
+        return searchProvidersRepository
+            .getSearchProvidersByCategory(category = category)
+            .filter { it.info.id in enabledSearchProvidersId }
     }
 
     private suspend fun getSearchResultsLimit(): MaxNumResults {
