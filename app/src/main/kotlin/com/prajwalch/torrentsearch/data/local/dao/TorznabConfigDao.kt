@@ -13,20 +13,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TorznabConfigDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(entity: TorznabConfigEntity)
+    suspend fun insertConfig(entity: TorznabConfigEntity)
 
     @Query("SELECT * from torznab_configs")
-    fun observeAll(): Flow<List<TorznabConfigEntity>>
-
-    @Query("SELECT * from torznab_configs where id=:id")
-    suspend fun findById(id: String): TorznabConfigEntity?
+    fun getAllConfigs(): Flow<List<TorznabConfigEntity>>
 
     @Query("SELECT COUNT(id) from torznab_configs")
-    fun observeCount(): Flow<Int>
+    fun getConfigsCount(): Flow<Int>
+
+    @Query("SELECT * from torznab_configs where id=:id")
+    suspend fun findConfigById(id: String): TorznabConfigEntity?
 
     @Update
-    suspend fun update(entity: TorznabConfigEntity)
+    suspend fun updateConfig(entity: TorznabConfigEntity)
 
     @Query("DELETE from torznab_configs where id=:id")
-    suspend fun deleteById(id: String)
+    suspend fun deleteConfigById(id: String)
 }

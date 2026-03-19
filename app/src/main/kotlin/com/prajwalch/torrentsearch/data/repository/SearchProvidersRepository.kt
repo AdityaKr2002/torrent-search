@@ -85,7 +85,7 @@ class SearchProvidersRepository @Inject constructor(
 
     fun observeSearchProvidersInfo(): Flow<List<SearchProviderInfo>> {
         val builtinSearchProvidersInfoFlow = flowOf(builtins.map { it.info })
-        val torznabSearchProvidersInfoFlow = torznabConfigDao.observeAll().map {
+        val torznabSearchProvidersInfoFlow = torznabConfigDao.getAllConfigs().map {
             it.toSearchProviderInfo()
         }
 
@@ -100,7 +100,7 @@ class SearchProvidersRepository @Inject constructor(
     }
 
     fun observeSearchProvidersCount(): Flow<Int> {
-        return torznabConfigDao.observeCount().map { it + builtins.size }
+        return torznabConfigDao.getConfigsCount().map { it + builtins.size }
     }
 
     suspend fun getSearchProvidersInstance(category: Category): List<SearchProvider> {
@@ -129,7 +129,7 @@ class SearchProvidersRepository @Inject constructor(
 
     suspend fun getSearchProvidersInstance(): List<SearchProvider> {
         val builtinSearchProvidersFlow = flowOf(builtins)
-        val torznabSearchProvidersFlow = torznabConfigDao.observeAll().map { entities ->
+        val torznabSearchProvidersFlow = torznabConfigDao.getAllConfigs().map { entities ->
             entities.map { TorznabSearchProvider(id = it.searchProviderId, config = it.toDomain()) }
         }
 
@@ -159,11 +159,11 @@ class SearchProvidersRepository @Inject constructor(
             apiKey = apiKey,
             category = category.name,
         )
-        torznabConfigDao.insert(entity = configEntity)
+        torznabConfigDao.insertConfig(entity = configEntity)
     }
 
     suspend fun findTorznabConfig(id: SearchProviderId): TorznabConfig? {
-        return torznabConfigDao.findById(id = id)?.toDomain()
+        return torznabConfigDao.findConfigById(id = id)?.toDomain()
     }
 
     suspend fun updateTorznabConfig(
@@ -180,10 +180,10 @@ class SearchProvidersRepository @Inject constructor(
             apiKey = apiKey,
             category = category.name,
         )
-        torznabConfigDao.update(entity = configEntity)
+        torznabConfigDao.updateConfig(entity = configEntity)
     }
 
     suspend fun deleteTorznabConfig(id: SearchProviderId) {
-        torznabConfigDao.deleteById(id = id)
+        torznabConfigDao.deleteConfigById(id = id)
     }
 }
