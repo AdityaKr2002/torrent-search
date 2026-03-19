@@ -9,9 +9,8 @@ import com.prajwalch.torrentsearch.providers.SearchProvider
 
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.withContext
 
 import java.io.OutputStream
@@ -30,27 +29,31 @@ class TorrentsRepository @Inject constructor(
         query: String,
         category: Category,
         searchProviders: List<SearchProvider>,
-    ): Flow<SearchResults> = flow {
-        val successes = mutableListOf<Torrent>()
-        val failures = mutableListOf<SearchException>()
-
-        remoteDataSource.searchTorrents(
-            query = query,
+    ) = remoteDataSource.searchTorrents(
+        query = query,
+        category = category,
+        searchProviders = searchProviders,
+    ).scan(SearchResults()) { searchResults, batchResult ->
+        processBatchResult(
+            currentSearchResults = searchResults,
+            batchResult = batchResult,
             category = category,
-            searchProviders = searchProviders,
-        ).collect { searchBatchResult ->
-            searchBatchResult.fold(
-                onSuccess = { successes.addAll(filterTorrentsByCategory(it, category)) },
-                onFailure = { failures.add(it as SearchException) }
-            )
-
-            val searchResults = SearchResults(
-                successes = successes.toImmutableList(),
-                failures = failures.toImmutableList(),
-            )
-            emit(searchResults)
-        }
+        )
     }.flowOn(Dispatchers.IO)
+
+    private fun processBatchResult(
+        currentSearchResults: SearchResults,
+        batchResult: Result<List<Torrent>>,
+        category: Category,
+    ): SearchResults = batchResult.fold(
+        onSuccess = {
+            val newSuccesses = filterTorrentsByCategory(torrents = it, category = category)
+            currentSearchResults.appendSuccesses(newSuccesses)
+        },
+        onFailure = {
+            currentSearchResults.appendFailure(it as SearchException)
+        },
+    )
 
     private fun filterTorrentsByCategory(
         torrents: List<Torrent>,
@@ -80,4 +83,12 @@ class TorrentsRepository @Inject constructor(
         val fileContent = torrentFileContentCache[fileId]
         fileContent?.let(outputStream::write)
     }
+}
+
+private fun SearchResults.appendSuccesses(successes: List<Torrent>): SearchResults {
+    return this.copy(successes = this.successes.plus(successes).toImmutableList())
+}
+
+private fun SearchResults.appendFailure(failure: SearchException): SearchResults {
+    return this.copy(failures = this.failures.plus(failure).toImmutableList())
 }
