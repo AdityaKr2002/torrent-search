@@ -77,56 +77,18 @@ class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val searchProvidersRepository: SearchProvidersRepository,
 ) : ViewModel() {
-    val uiState = getSettingsFlow().stateIn(
+    val uiState = combine(
+        settingsRepository.getAppearanceSettings(),
+        settingsRepository.getGeneralSettings(),
+        settingsRepository.getSearchSettings(searchProvidersRepository.getSearchProvidersCount()),
+        settingsRepository.getSearchHistorySettings(),
+        settingsRepository.getAdvancedSettings(),
+        ::SettingsUiState,
+    ).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5.seconds),
         initialValue = SettingsUiState(),
     )
-
-    private fun getSettingsFlow(): Flow<SettingsUiState> {
-        val appearanceSettingsFlow = combine(
-            settingsRepository.enableDynamicTheme,
-            settingsRepository.darkTheme,
-            settingsRepository.pureBlack,
-            ::AppearanceSettingsUiState,
-        )
-        val generalSettingsFlow = settingsRepository
-            .enableNSFWMode
-            .map(::GeneralSettingsUiState)
-
-        val searchProvidersStatFlow = combine(
-            settingsRepository.enabledSearchProvidersId.map { it.size },
-            searchProvidersRepository.getSearchProvidersCount(),
-            SearchSettingsUiState::SearchProvidersStat,
-        )
-        val searchSettingsFlow = combine(
-            searchProvidersStatFlow,
-            settingsRepository.defaultCategory,
-            settingsRepository.defaultSortOptions,
-            settingsRepository.maxNumResults,
-            ::SearchSettingsUiState,
-        )
-
-        val searchHistorySettingsFlow = combine(
-            settingsRepository.saveSearchHistory,
-            settingsRepository.showSearchHistory,
-            ::SearchHistorySettingsUiState,
-        )
-        val advancedSettingsFlow = combine(
-            settingsRepository.enableShareIntegration,
-            settingsRepository.enableQuickSearch,
-            ::AdvancedSettingsUiState,
-        )
-
-        return combine(
-            appearanceSettingsFlow,
-            generalSettingsFlow,
-            searchSettingsFlow,
-            searchHistorySettingsFlow,
-            advancedSettingsFlow,
-            ::SettingsUiState,
-        )
-    }
 
     /** Enables/disables dynamic theme. */
     fun enableDynamicTheme(enable: Boolean) {
@@ -246,3 +208,46 @@ class SettingsViewModel @Inject constructor(
         }
     }
 }
+
+private fun SettingsRepository.getAppearanceSettings() =
+    combine(
+        this.enableDynamicTheme,
+        this.darkTheme,
+        this.pureBlack,
+        ::AppearanceSettingsUiState,
+    )
+
+private fun SettingsRepository.getGeneralSettings() =
+    this.enableNSFWMode.map(::GeneralSettingsUiState)
+
+private fun SettingsRepository.getSearchSettings(
+    searchProvidersCount: Flow<Int>,
+): Flow<SearchSettingsUiState> {
+    val searchProvidersStat = combine(
+        this.enabledSearchProvidersId.map { it.size },
+        searchProvidersCount,
+        SearchSettingsUiState::SearchProvidersStat,
+    )
+
+    return combine(
+        searchProvidersStat,
+        this.defaultCategory,
+        this.defaultSortOptions,
+        this.maxNumResults,
+        ::SearchSettingsUiState,
+    )
+}
+
+private fun SettingsRepository.getSearchHistorySettings() =
+    combine(
+        this.saveSearchHistory,
+        this.showSearchHistory,
+        ::SearchHistorySettingsUiState,
+    )
+
+private fun SettingsRepository.getAdvancedSettings() =
+    combine(
+        this.enableShareIntegration,
+        this.enableQuickSearch,
+        ::AdvancedSettingsUiState,
+    )
