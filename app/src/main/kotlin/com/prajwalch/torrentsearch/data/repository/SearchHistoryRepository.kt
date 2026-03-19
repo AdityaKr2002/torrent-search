@@ -14,7 +14,7 @@ import javax.inject.Inject
 class SearchHistoryRepository @Inject constructor(private val dao: SearchHistoryDao) {
     /** Returns all the saved search history. */
     fun observeAllSearchHistories(): Flow<List<SearchHistory>> {
-        return dao.observeAll().map { it.toDomain() }
+        return dao.getAllSearchHistories().map { it.toDomain() }
     }
 
     /**
@@ -23,16 +23,16 @@ class SearchHistoryRepository @Inject constructor(private val dao: SearchHistory
      */
     suspend fun createNewSearchHistory(query: String) {
         val searchHistory = SearchHistory(query = query.trim())
-        dao.insert(searchHistory.toEntity())
+        dao.insertSearchHistory(searchHistory.toEntity())
     }
 
     /** Deletes the search history which matches the specified id. */
     suspend fun deleteSearchHistoryById(id: SearchHistoryId) {
-        dao.deleteById(id = id)
+        dao.deleteSearchHistoryById(id = id)
     }
 
     /** Clears all search history. */
     suspend fun deleteAllSearchHistories() {
-        dao.deleteAll()
+        dao.deleteAllSearchHistories()
     }
 }

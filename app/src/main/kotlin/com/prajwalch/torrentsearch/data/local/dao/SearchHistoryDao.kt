@@ -12,14 +12,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SearchHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(searchHistory: SearchHistoryEntity)
+    suspend fun insertSearchHistory(searchHistory: SearchHistoryEntity)
 
     @Query("SELECT * from search_history ORDER by id DESC")
-    fun observeAll(): Flow<List<SearchHistoryEntity>>
+    fun getAllSearchHistories(): Flow<List<SearchHistoryEntity>>
 
     @Query("DElETE from search_history where id=:id")
-    suspend fun deleteById(id: Long)
+    suspend fun deleteSearchHistoryById(id: Long)
 
     @Query("DELETE from search_history")
-    suspend fun deleteAll()
+    suspend fun deleteAllSearchHistories()
 }
