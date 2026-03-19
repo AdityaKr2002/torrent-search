@@ -13,17 +13,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BookmarkedTorrentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(bookmarkedTorrent: BookmarkedTorrent)
+    suspend fun insertBookmark(bookmarkedTorrent: BookmarkedTorrent)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(bookmarkedTorrents: List<BookmarkedTorrent>)
+    suspend fun insertBookmarks(bookmarkedTorrents: List<BookmarkedTorrent>)
 
     @Query("SELECT * FROM bookmarks ORDER by id DESC")
-    fun observeAll(): Flow<List<BookmarkedTorrent>>
+    fun getAllBookmarks(): Flow<List<BookmarkedTorrent>>
 
     @Delete
-    suspend fun delete(bookmarkedTorrent: BookmarkedTorrent)
+    suspend fun deleteBookmark(bookmarkedTorrent: BookmarkedTorrent)
 
     @Query("DELETE from bookmarks")
-    suspend fun deleteAll()
+    suspend fun deleteAllBookmarks()
 }

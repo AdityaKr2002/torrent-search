@@ -26,19 +26,19 @@ import javax.inject.Inject
 
 class BookmarksRepository @Inject constructor(private val dao: BookmarkedTorrentDao) {
     fun observeAllBookmarks(): Flow<List<Torrent>> {
-        return dao.observeAll().map { it.toDomain() }
+        return dao.getAllBookmarks().map { it.toDomain() }
     }
 
     suspend fun bookmarkTorrent(torrent: Torrent) {
-        dao.insert(bookmarkedTorrent = torrent.toEntity())
+        dao.insertBookmark(bookmarkedTorrent = torrent.toEntity())
     }
 
     suspend fun deleteBookmarkedTorrent(torrent: Torrent) {
-        dao.delete(bookmarkedTorrent = torrent.toEntity())
+        dao.deleteBookmark(bookmarkedTorrent = torrent.toEntity())
     }
 
     suspend fun deleteAllBookmarks() {
-        dao.deleteAll()
+        dao.deleteAllBookmarks()
     }
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -47,7 +47,7 @@ class BookmarksRepository @Inject constructor(private val dao: BookmarkedTorrent
 
         try {
             val bookmarksEntity = Json.decodeFromStream<List<BookmarkedTorrent>>(inputStream)
-            dao.insertAll(bookmarksEntity)
+            dao.insertBookmarks(bookmarksEntity)
             Log.i(TAG, "Import succeed")
         } catch (e: IllegalArgumentException) {
             Log.e(TAG, "Input cannot be represented as a valid Json type", e)
@@ -61,7 +61,7 @@ class BookmarksRepository @Inject constructor(private val dao: BookmarkedTorrent
         Log.i(TAG, "Exporting bookmarks")
 
         try {
-            val bookmarksEntity = dao.observeAll().firstOrNull() ?: return@withContext
+            val bookmarksEntity = dao.getAllBookmarks().firstOrNull() ?: return@withContext
             Json.encodeToStream(bookmarksEntity, outputStream)
             Log.i(TAG, "Export succeed")
         } catch (e: IllegalArgumentException) {
