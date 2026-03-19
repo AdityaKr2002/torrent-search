@@ -35,13 +35,10 @@ import com.prajwalch.torrentsearch.providers.UIndex
 import com.prajwalch.torrentsearch.providers.XXXClub
 import com.prajwalch.torrentsearch.providers.XXXTracker
 import com.prajwalch.torrentsearch.providers.Yts
-
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
-
 import java.util.UUID
-
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -77,7 +74,7 @@ class SearchProvidersRepository @Inject constructor(
     )
 
     suspend fun getSearchProvidersByCategory(category: Category): List<SearchProvider> {
-        val searchProviders = getSearchProviders().toList().flatten()
+        val searchProviders = getSearchProviders().firstOrNull() ?: return emptyList()
 
         return if (category == Category.All) {
             searchProviders
