@@ -47,7 +47,7 @@ class HomeViewModel @Inject constructor(
     val uiState = combine(
         searchQuery,
         selectedCategory,
-        searchHistoryRepository.observeAllSearchHistories(),
+        searchHistoryRepository.getAllSearchHistories(),
         settingsRepository.getHomeSettings(),
         ::createUiState,
     ).stateIn(

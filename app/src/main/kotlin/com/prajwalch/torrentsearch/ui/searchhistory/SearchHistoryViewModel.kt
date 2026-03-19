@@ -22,7 +22,7 @@ class SearchHistoryViewModel @Inject constructor(
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
     val uiState = searchHistoryRepository
-        .observeAllSearchHistories()
+        .getAllSearchHistories()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5.seconds),

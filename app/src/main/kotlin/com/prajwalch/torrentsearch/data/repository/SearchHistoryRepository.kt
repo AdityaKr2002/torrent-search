@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class SearchHistoryRepository @Inject constructor(private val dao: SearchHistoryDao) {
     /** Returns all the saved search history. */
-    fun observeAllSearchHistories(): Flow<List<SearchHistory>> {
+    fun getAllSearchHistories(): Flow<List<SearchHistory>> {
         return dao.getAllSearchHistories().map { it.toDomain() }
     }
 
