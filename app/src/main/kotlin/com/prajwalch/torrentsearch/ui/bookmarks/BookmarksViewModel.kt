@@ -9,7 +9,6 @@ import com.prajwalch.torrentsearch.domain.models.SortCriteria
 import com.prajwalch.torrentsearch.domain.models.SortOptions
 import com.prajwalch.torrentsearch.domain.models.SortOrder
 import com.prajwalch.torrentsearch.domain.models.Torrent
-import com.prajwalch.torrentsearch.domain.models.TorrentFileDownloadState
 import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloader
 import com.prajwalch.torrentsearch.utils.createSortComparator
 
@@ -32,7 +31,6 @@ import kotlin.time.Duration.Companion.seconds
 data class BookmarksUiState(
     val bookmarks: List<Torrent> = emptyList(),
     val sortOptions: SortOptions = SortOptions(),
-    val torrentFileDownloadState: TorrentFileDownloadState = TorrentFileDownloadState.Empty,
 )
 
 /** ViewModel that handles the business logic of Bookmarks screen. */
