@@ -46,7 +46,7 @@ class BookmarksViewModel @Inject constructor(
     val torrentFileDownloadEvents = torrentFileDownloader.events
     val uiState = combine(
         filterQuery,
-        bookmarksRepository.observeAllBookmarks(),
+        bookmarksRepository.getAllBookmarks(),
         settingsRepository.enableNSFWMode,
         settingsRepository.bookmarksSortOptions,
     ) { filterQuery, bookmarks, nsfwModeEnabled, sortOptions ->
