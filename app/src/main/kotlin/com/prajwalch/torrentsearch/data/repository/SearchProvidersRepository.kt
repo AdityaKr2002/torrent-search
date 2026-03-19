@@ -76,7 +76,7 @@ class SearchProvidersRepository @Inject constructor(
     )
 
     suspend fun getSearchProvidersByCategory(category: Category): List<SearchProvider> {
-        val searchProviders = getSearchProviders().firstOrNull() ?: return emptyList()
+        val searchProviders = getSearchProviders().firstOrNull() ?: builtins
 
         return if (category == Category.All) {
             searchProviders
