@@ -2,7 +2,6 @@ package com.prajwalch.torrentsearch.ui.home
 
 import android.os.Build
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,13 +40,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.domain.model.Category
-import com.prajwalch.torrentsearch.domain.model.SearchHistory
-import com.prajwalch.torrentsearch.domain.model.SearchHistoryId
 import com.prajwalch.torrentsearch.ui.component.CategoryChipsRow
 import com.prajwalch.torrentsearch.ui.component.ExpandableSearchBar
-import com.prajwalch.torrentsearch.ui.component.SearchHistoryList
-import com.prajwalch.torrentsearch.ui.component.SearchHistoryListItem
 import com.prajwalch.torrentsearch.ui.component.SettingsIconButton
+import com.prajwalch.torrentsearch.ui.home.component.SearchHistoryList
 import com.prajwalch.torrentsearch.ui.theme.spaces
 
 import kotlinx.coroutines.flow.collectLatest
@@ -133,12 +129,12 @@ fun HomeScreen(
             ) {
                 SearchHistoryList(
                     histories = uiState.histories,
-                    onSearchQueryClick = {
+                    onSearchRequest = {
                         onSearch(it, uiState.selectedCategory)
                         textFieldState.setTextAndPlaceCursorAtEnd(it)
                         coroutineScope.launch { searchBarState.animateToCollapsed() }
                     },
-                    onChangeSearchQuery = textFieldState::setTextAndPlaceCursorAtEnd,
+                    onInsertQuery = textFieldState::setTextAndPlaceCursorAtEnd,
                     onDeleteSearchHistory = viewModel::deleteSearchHistory,
                 )
             }
@@ -193,30 +189,5 @@ private fun HomeScreenTopBar(
             SettingsIconButton(onClick = onNavigateToSettings)
         },
         scrollBehavior = scrollBehavior,
-    )
-}
-
-@Composable
-private fun SearchHistoryList(
-    histories: List<SearchHistory>,
-    onSearchQueryClick: (String) -> Unit,
-    onChangeSearchQuery: (String) -> Unit,
-    onDeleteSearchHistory: (SearchHistoryId) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SearchHistoryList(
-        modifier = modifier,
-        histories = histories,
-        historyListItem = {
-            SearchHistoryListItem(
-                modifier = Modifier
-                    .animateItem()
-                    .clickable(onClick = { onSearchQueryClick(it.query) }),
-                query = it.query,
-                onInsertClick = { onChangeSearchQuery(it.query) },
-                onDeleteClick = { onDeleteSearchHistory(it.id) },
-            )
-        },
-        key = { it.id },
     )
 }
