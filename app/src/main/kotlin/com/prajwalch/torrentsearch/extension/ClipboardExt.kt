@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.extensions
+package com.prajwalch.torrentsearch.extension
 
 import android.content.ClipData
 

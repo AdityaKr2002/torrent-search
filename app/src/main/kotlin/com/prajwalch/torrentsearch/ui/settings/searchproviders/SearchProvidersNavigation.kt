@@ -4,8 +4,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.navigation
 
-import com.prajwalch.torrentsearch.extensions.childComposable
-import com.prajwalch.torrentsearch.extensions.parentComposable
+import com.prajwalch.torrentsearch.extension.childComposable
+import com.prajwalch.torrentsearch.extension.parentComposable
 import com.prajwalch.torrentsearch.providers.SearchProviderId
 import com.prajwalch.torrentsearch.ui.settings.searchproviders.addedit.AddEditSearchProviderScreen
 

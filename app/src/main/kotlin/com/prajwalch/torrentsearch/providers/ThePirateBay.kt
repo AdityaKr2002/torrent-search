@@ -3,9 +3,9 @@ package com.prajwalch.torrentsearch.providers
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.InfoHashOrMagnetUri
 import com.prajwalch.torrentsearch.domain.model.Torrent
-import com.prajwalch.torrentsearch.extensions.asArray
-import com.prajwalch.torrentsearch.extensions.asObject
-import com.prajwalch.torrentsearch.extensions.getString
+import com.prajwalch.torrentsearch.extension.asArray
+import com.prajwalch.torrentsearch.extension.asObject
+import com.prajwalch.torrentsearch.extension.getString
 import com.prajwalch.torrentsearch.util.DateUtils
 import com.prajwalch.torrentsearch.util.FileSizeUtils
 import kotlinx.coroutines.Dispatchers

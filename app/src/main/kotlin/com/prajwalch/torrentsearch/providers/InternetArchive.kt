@@ -3,11 +3,11 @@ package com.prajwalch.torrentsearch.providers
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.InfoHashOrMagnetUri
 import com.prajwalch.torrentsearch.domain.model.Torrent
-import com.prajwalch.torrentsearch.extensions.asObject
-import com.prajwalch.torrentsearch.extensions.getArray
-import com.prajwalch.torrentsearch.extensions.getLong
-import com.prajwalch.torrentsearch.extensions.getObject
-import com.prajwalch.torrentsearch.extensions.getString
+import com.prajwalch.torrentsearch.extension.asObject
+import com.prajwalch.torrentsearch.extension.getArray
+import com.prajwalch.torrentsearch.extension.getLong
+import com.prajwalch.torrentsearch.extension.getObject
+import com.prajwalch.torrentsearch.extension.getString
 import com.prajwalch.torrentsearch.util.DateUtils
 import com.prajwalch.torrentsearch.util.FileSizeUtils
 

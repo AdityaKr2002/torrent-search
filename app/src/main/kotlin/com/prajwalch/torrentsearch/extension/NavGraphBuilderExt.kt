@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.extensions
+package com.prajwalch.torrentsearch.extension
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
