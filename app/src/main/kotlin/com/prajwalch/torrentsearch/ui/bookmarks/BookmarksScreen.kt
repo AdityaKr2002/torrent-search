@@ -2,35 +2,26 @@ package com.prajwalch.torrentsearch.ui.bookmarks
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,50 +30,40 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.constant.TorrentSearchConstants
 import com.prajwalch.torrentsearch.domain.model.MagnetUri
+import com.prajwalch.torrentsearch.domain.model.SortCriteria
+import com.prajwalch.torrentsearch.domain.model.SortOrder
 import com.prajwalch.torrentsearch.domain.model.Torrent
 import com.prajwalch.torrentsearch.extension.copyText
 import com.prajwalch.torrentsearch.ui.TorrentFileDownloadEffect
+import com.prajwalch.torrentsearch.ui.bookmarks.component.BookmarkList
+import com.prajwalch.torrentsearch.ui.bookmarks.component.BookmarksCount
+import com.prajwalch.torrentsearch.ui.bookmarks.component.DeleteAllConfirmationDialog
 import com.prajwalch.torrentsearch.ui.component.AnimatedScrollToTopFAB
 import com.prajwalch.torrentsearch.ui.component.ArrowBackIconButton
 import com.prajwalch.torrentsearch.ui.component.CollapsibleSearchBar
 import com.prajwalch.torrentsearch.ui.component.DeleteForeverIconButton
 import com.prajwalch.torrentsearch.ui.component.EmptyPlaceholder
-import com.prajwalch.torrentsearch.ui.component.LazyColumnWithScrollbar
 import com.prajwalch.torrentsearch.ui.component.RoundedDropdownMenu
 import com.prajwalch.torrentsearch.ui.component.SearchIconButton
 import com.prajwalch.torrentsearch.ui.component.SortDropdownMenu
 import com.prajwalch.torrentsearch.ui.component.SortIconButton
 import com.prajwalch.torrentsearch.ui.component.TorrentActionsBottomSheet
-import com.prajwalch.torrentsearch.ui.component.TorrentListItem
 import com.prajwalch.torrentsearch.ui.component.rememberCollapsibleSearchBarState
 import com.prajwalch.torrentsearch.ui.rememberTorrentListState
-import com.prajwalch.torrentsearch.ui.theme.spaces
 
 import kotlinx.coroutines.launch
-
-/** Activity contract which allows the user to choose the export location. */
-private val CreateDocumentContract =
-    ActivityResultContracts.CreateDocument(TorrentSearchConstants.BOOKMARKS_EXPORT_FILE_TYPE)
-
-/** Activity contract which allows the user to choose the exported file. */
-private val GetContentContract = ActivityResultContracts.GetContent()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,14 +82,14 @@ fun BookmarksScreen(
 
     val contentResolver = LocalContext.current.contentResolver
     val bookmarksExportedFileChooser = rememberLauncherForActivityResult(
-        contract = GetContentContract,
+        ActivityResultContracts.GetContent(),
     ) { fileUri ->
         fileUri
             ?.let(contentResolver::openInputStream)
             ?.let(viewModel::importBookmarks)
     }
     val bookmarksExportLocationChooser = rememberLauncherForActivityResult(
-        contract = CreateDocumentContract,
+        ActivityResultContracts.CreateDocument(TorrentSearchConstants.BOOKMARKS_EXPORT_FILE_TYPE),
     ) { fileUri ->
         fileUri
             ?.let(contentResolver::openOutputStream)
@@ -117,12 +98,10 @@ fun BookmarksScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val snackbarHostState = remember { SnackbarHostState() }
     val torrentListState = rememberTorrentListState(itemsCount = { uiState.bookmarks.size })
 
-    // Bookmark related states.
     var selectedBookmark by retain { mutableStateOf<Torrent?>(null) }
-    val snackbarHostState = remember { SnackbarHostState() }
-
     selectedBookmark?.let { bookmark ->
         val clipboard = LocalClipboard.current
 
@@ -185,82 +164,6 @@ fun BookmarksScreen(
         )
     }
 
-    val searchBarState = rememberCollapsibleSearchBarState(visibleOnInitial = false)
-    val topBarTitle: @Composable () -> Unit = @Composable {
-        CollapsibleSearchBar(
-            state = searchBarState,
-            onQueryChange = viewModel::filterBookmarks,
-            placeholder = { Text(text = stringResource(R.string.bookmarks_search_query_hint)) },
-        )
-        if (!searchBarState.isVisible) {
-            Column {
-                Text(text = stringResource(R.string.bookmarks_screen_title))
-
-                if (uiState.bookmarks.isNotEmpty()) {
-                    BookmarksCount(
-                        totalBookmarksCount = uiState.bookmarks.size,
-                        currentBookmarksCount = uiState.bookmarks.size,
-                    )
-                }
-            }
-        }
-    }
-    val topBarActions: @Composable RowScope.() -> Unit = @Composable {
-        var showSortOptions by rememberSaveable(uiState.sortOptions) { mutableStateOf(false) }
-        var showAdditionalActions by rememberSaveable { mutableStateOf(false) }
-        val enableBookmarksActions = uiState.bookmarks.isNotEmpty() || !searchBarState.isTextBlank
-
-        if (!searchBarState.isVisible) {
-            SearchIconButton(
-                onClick = { searchBarState.showSearchBar() },
-                enabled = enableBookmarksActions,
-            )
-            SortIconButton(
-                onClick = { showSortOptions = true },
-                enabled = enableBookmarksActions,
-            )
-            SortDropdownMenu(
-                expanded = showSortOptions,
-                onDismissRequest = { showSortOptions = false },
-                currentCriteria = uiState.sortOptions.criteria,
-                onChangeCriteria = viewModel::setSortCriteria,
-                currentOrder = uiState.sortOptions.order,
-                onChangeOrder = viewModel::setSortOrder,
-            )
-            DeleteForeverIconButton(
-                onClick = { showDeleteAllConfirmationDialog = true },
-                contentDescription = R.string.bookmarks_action_delete_all,
-                enabled = enableBookmarksActions,
-            )
-        }
-        Box {
-            IconButton(onClick = { showAdditionalActions = true }) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_more_vert),
-                    contentDescription = null,
-                )
-            }
-            TopBarAdditionalActionsDropdownMenu(
-                expanded = showAdditionalActions,
-                onDismiss = { showAdditionalActions = false },
-                onImportBookmarks = {
-                    // When mime type is given it restricts other type of files
-                    // from being selectable.
-                    bookmarksExportedFileChooser.launch(
-                        TorrentSearchConstants.BOOKMARKS_EXPORT_FILE_TYPE,
-                    )
-                },
-                onExportBookmarks = {
-                    // Takes file name to create on the selected location.
-                    bookmarksExportLocationChooser.launch(
-                        TorrentSearchConstants.BOOKMARKS_EXPORT_FILE_NAME,
-                    )
-                },
-                onNavigateToSettings = onNavigateToSettings,
-            )
-        }
-    }
-
     TorrentFileDownloadEffect(
         onWrite = viewModel::writeTorrentFile,
         state = torrentFileDownloadState,
@@ -275,10 +178,27 @@ fun BookmarksScreen(
             .then(modifier),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = topBarTitle,
-                navigationIcon = { ArrowBackIconButton(onClick = onNavigateBack) },
-                actions = topBarActions,
+            BookmarksScreenTopBar(
+                uiState = uiState,
+                onNavigateBack = onNavigateBack,
+                onFilterBookmarks = viewModel::filterBookmarks,
+                onChangeSortCriteria = viewModel::setSortCriteria,
+                onChangeSortOrder = viewModel::setSortOrder,
+                onDeleteAllBookmarks = { showDeleteAllConfirmationDialog = true },
+                onImportBookmarks = {
+                    // When mime type is given it restricts other type of files
+                    // from being selectable.
+                    bookmarksExportedFileChooser.launch(
+                        TorrentSearchConstants.BOOKMARKS_EXPORT_FILE_TYPE,
+                    )
+                },
+                onExportBookmarks = {
+                    // Takes file name to create on the selected location.
+                    bookmarksExportLocationChooser.launch(
+                        TorrentSearchConstants.BOOKMARKS_EXPORT_FILE_NAME,
+                    )
+                },
+                onNavigateToSettings = onNavigateToSettings,
                 scrollBehavior = scrollBehavior,
             )
         },
@@ -309,6 +229,104 @@ fun BookmarksScreen(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BookmarksScreenTopBar(
+    uiState: BookmarksUiState,
+    onNavigateBack: () -> Unit,
+    onFilterBookmarks: (String) -> Unit,
+    onChangeSortCriteria: (SortCriteria) -> Unit,
+    onChangeSortOrder: (SortOrder) -> Unit,
+    onDeleteAllBookmarks: () -> Unit,
+    onImportBookmarks: () -> Unit,
+    onExportBookmarks: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    modifier: Modifier = Modifier,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+) {
+    val searchBarState = rememberCollapsibleSearchBarState(visibleOnInitial = false)
+
+    val topBarTitle: @Composable () -> Unit = @Composable {
+        CollapsibleSearchBar(
+            state = searchBarState,
+            onQueryChange = onFilterBookmarks,
+            placeholder = { Text(text = stringResource(R.string.bookmarks_search_query_hint)) },
+        )
+
+        if (!searchBarState.isVisible) {
+            Column(verticalArrangement = Arrangement.Center) {
+                Text(text = stringResource(R.string.bookmarks_screen_title))
+                // Subtitle.
+                AnimatedVisibility(visible = uiState.bookmarks.isNotEmpty()) {
+                    BookmarksCount(
+                        totalBookmarksCount = uiState.bookmarks.size,
+                        currentBookmarksCount = uiState.bookmarks.size,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+            }
+        }
+    }
+    val topBarActions: @Composable RowScope.() -> Unit = @Composable {
+        var showSortOptions by rememberSaveable(uiState.sortOptions) { mutableStateOf(false) }
+        // Bookmark related actions refers to those actions that directly
+        // operate on bookmark/s.
+        val enableBookmarkRelatedActions =
+            uiState.bookmarks.isNotEmpty() || !searchBarState.isTextBlank
+
+        if (!searchBarState.isVisible) {
+            SearchIconButton(
+                onClick = { searchBarState.showSearchBar() },
+                enabled = enableBookmarkRelatedActions,
+            )
+            SortIconButton(
+                onClick = { showSortOptions = true },
+                enabled = enableBookmarkRelatedActions,
+            )
+            SortDropdownMenu(
+                expanded = showSortOptions,
+                onDismissRequest = { showSortOptions = false },
+                currentCriteria = uiState.sortOptions.criteria,
+                onChangeCriteria = onChangeSortCriteria,
+                currentOrder = uiState.sortOptions.order,
+                onChangeOrder = onChangeSortOrder,
+            )
+            DeleteForeverIconButton(
+                onClick = onDeleteAllBookmarks,
+                contentDescription = R.string.bookmarks_action_delete_all,
+                enabled = enableBookmarkRelatedActions,
+            )
+        }
+
+        // Additional actions.
+        Box {
+            var showAdditionalActions by rememberSaveable { mutableStateOf(false) }
+
+            IconButton(onClick = { showAdditionalActions = true }) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_more_vert),
+                    contentDescription = null,
+                )
+            }
+            TopBarAdditionalActionsDropdownMenu(
+                expanded = showAdditionalActions,
+                onDismiss = { showAdditionalActions = false },
+                onImportBookmarks = onImportBookmarks,
+                onExportBookmarks = onExportBookmarks,
+                onNavigateToSettings = onNavigateToSettings,
+            )
+        }
+    }
+
+    TopAppBar(
+        title = topBarTitle,
+        navigationIcon = { ArrowBackIconButton(onClick = onNavigateBack) },
+        actions = topBarActions,
+        scrollBehavior = scrollBehavior,
+    )
 }
 
 @Composable
@@ -358,134 +376,6 @@ private fun TopBarAdditionalActionsDropdownMenu(
                     contentDescription = stringResource(R.string.bookmarks_action_settings),
                 )
             },
-        )
-    }
-}
-
-@Composable
-private fun BookmarksCount(
-    totalBookmarksCount: Int,
-    currentBookmarksCount: Int,
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    style: TextStyle = MaterialTheme.typography.labelMedium,
-) {
-    Text(
-        modifier = modifier,
-        text = pluralStringResource(
-            R.plurals.bookmarks_count_format,
-            totalBookmarksCount,
-            currentBookmarksCount,
-        ),
-        color = color,
-        style = style,
-    )
-}
-
-@Composable
-private fun DeleteAllConfirmationDialog(
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    AlertDialog(
-        modifier = modifier,
-        onDismissRequest = onDismiss,
-        icon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_delete_forever),
-                contentDescription = null,
-            )
-        },
-        title = {
-            Text(text = stringResource(R.string.bookmarks_dialog_title_delete_all))
-        },
-        text = {
-            Text(text = stringResource(R.string.bookmarks_dialog_message_delete_all))
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(text = stringResource(R.string.bookmarks_button_delete))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.button_cancel))
-            }
-        },
-    )
-}
-
-@Composable
-private fun BookmarkList(
-    bookmarks: List<Torrent>,
-    onBookmarkClick: (Torrent) -> Unit,
-    onDeleteBookmark: (Torrent) -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    lazyListState: LazyListState,
-) {
-    LazyColumnWithScrollbar(
-        modifier = modifier,
-        state = lazyListState,
-        contentPadding = contentPadding,
-    ) {
-        items(items = bookmarks, key = { it.id }, contentType = { it.category }) {
-            BookmarkListItem(
-                modifier = Modifier.animateItem(),
-                bookmark = it,
-                onClick = { onBookmarkClick(it) },
-                onDelete = { onDeleteBookmark(it) },
-            )
-            HorizontalDivider()
-        }
-    }
-}
-
-@Composable
-private fun BookmarkListItem(
-    bookmark: Torrent,
-    onClick: () -> Unit,
-    onDelete: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
-    val coroutineScope = rememberCoroutineScope()
-
-    SwipeToDismissBox(
-        modifier = modifier,
-        state = swipeToDismissBoxState,
-        backgroundContent = {
-            Icon(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.errorContainer)
-                    .wrapContentSize(align = Alignment.CenterEnd)
-                    .padding(horizontal = MaterialTheme.spaces.large),
-                painter = painterResource(R.drawable.ic_delete),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onErrorContainer,
-            )
-        },
-        enableDismissFromStartToEnd = false,
-        onDismiss = { direction ->
-            if (direction == SwipeToDismissBoxValue.EndToStart) {
-                onDelete()
-            } else {
-                coroutineScope.launch { swipeToDismissBoxState.reset() }
-            }
-        },
-    ) {
-        TorrentListItem(
-            modifier = Modifier.clickable(onClick = onClick),
-            name = bookmark.name,
-            size = bookmark.size,
-            seeders = bookmark.seeders,
-            peers = bookmark.peers,
-            uploadDate = bookmark.uploadDate,
-            category = bookmark.category,
-            providerName = bookmark.providerName,
-            isNSFW = bookmark.isNSFW(),
         )
     }
 }
