@@ -1,5 +1,7 @@
 package com.prajwalch.torrentsearch.ui.settings.searchproviders.addedit
 
+import android.content.Context
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,6 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,12 +50,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.constants.TorrentSearchConstants
 import com.prajwalch.torrentsearch.domain.models.Category
+import com.prajwalch.torrentsearch.domain.models.TorznabConnectionCheckResult
 import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
 import com.prajwalch.torrentsearch.ui.components.BottomInfo
 import com.prajwalch.torrentsearch.ui.components.TextUrl
 import com.prajwalch.torrentsearch.ui.theme.spaces
 import com.prajwalch.torrentsearch.utils.categoryStringResource
-import com.prajwalch.torrentsearch.utils.torznabConnectionCheckResultStringResource
 
 @Composable
 fun AddEditSearchProviderScreen(
@@ -61,24 +64,25 @@ fun AddEditSearchProviderScreen(
     viewModel: TorznabConfigViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val connectionCheckResultMessage = uiState.connectionCheckResult?.let {
-        torznabConnectionCheckResultStringResource(it)
-    }
     val topBarTitleId = if (uiState.isNewConfig) {
         R.string.search_providers_add_screen_title
     } else {
         R.string.search_providers_edit_screen_title
     }
 
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(uiState.isConfigSaved) {
-        if (uiState.isConfigSaved) onNavigateBack()
-    }
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                TorznabConfigEvent.ConfigSaved -> onNavigateBack()
 
-    LaunchedEffect(connectionCheckResultMessage) {
-        if (connectionCheckResultMessage != null) {
-            snackbarHostState.showSnackbar(message = connectionCheckResultMessage)
+                is TorznabConfigEvent.ConnectionCheckCompleted -> {
+                    val message = context.getTorznabConnectionCheckResultString(event.result)
+                    snackbarHostState.showSnackbar(message = message)
+                }
+            }
         }
     }
 
@@ -353,4 +357,40 @@ private fun LearnHowToAddLinkInfo(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.secondary,
         )
     }
+}
+
+fun Context.getTorznabConnectionCheckResultString(result: TorznabConnectionCheckResult): String {
+    if (result is TorznabConnectionCheckResult.ApplicationError) {
+        return this.getString(
+            R.string.torznab_conn_check_result_app_error,
+            result.errorCode,
+        )
+    }
+
+    if (result is TorznabConnectionCheckResult.UnexpectedResponse) {
+        return this.getString(
+            R.string.torznab_conn_check_result_unexpected_response,
+            result.errorCode,
+        )
+    }
+
+    val otherResId = when (result) {
+        TorznabConnectionCheckResult.ConnectionFailed -> {
+            R.string.torznab_conn_check_result_conn_failed
+        }
+
+        TorznabConnectionCheckResult.InvalidApiKey -> {
+            R.string.torznab_conn_check_result_invalid_api_key
+        }
+
+        TorznabConnectionCheckResult.ConnectionEstablished -> {
+            R.string.torznab_conn_check_result_conn_established
+        }
+
+        TorznabConnectionCheckResult.UnexpectedError -> {
+            R.string.torznab_conn_check_result_unexpected_error
+        }
+    }
+
+    return this.getString(otherResId)
 }

@@ -8,7 +8,6 @@ import com.prajwalch.torrentsearch.domain.models.Category
 import com.prajwalch.torrentsearch.domain.models.DarkTheme
 import com.prajwalch.torrentsearch.domain.models.SortCriteria
 import com.prajwalch.torrentsearch.domain.models.SortOrder
-import com.prajwalch.torrentsearch.domain.models.TorznabConnectionCheckResult
 
 @Composable
 fun darkThemeStringResource(darkTheme: DarkTheme): String {
@@ -60,41 +59,4 @@ fun sortOrderStringResource(sortOrder: SortOrder): String {
     }
 
     return stringResource(id = resId)
-}
-
-@Composable
-fun torznabConnectionCheckResultStringResource(result: TorznabConnectionCheckResult): String {
-    if (result is TorznabConnectionCheckResult.ApplicationError) {
-        return stringResource(
-            R.string.torznab_conn_check_result_app_error,
-            result.errorCode,
-        )
-    }
-
-    if (result is TorznabConnectionCheckResult.UnexpectedResponse) {
-        return stringResource(
-            R.string.torznab_conn_check_result_unexpected_response,
-            result.errorCode,
-        )
-    }
-
-    val otherResId = when (result) {
-        TorznabConnectionCheckResult.ConnectionFailed -> {
-            R.string.torznab_conn_check_result_conn_failed
-        }
-
-        TorznabConnectionCheckResult.InvalidApiKey -> {
-            R.string.torznab_conn_check_result_invalid_api_key
-        }
-
-        TorznabConnectionCheckResult.ConnectionEstablished -> {
-            R.string.torznab_conn_check_result_conn_established
-        }
-
-        TorznabConnectionCheckResult.UnexpectedError -> {
-            R.string.torznab_conn_check_result_unexpected_error
-        }
-    }
-
-    return stringResource(otherResId)
 }

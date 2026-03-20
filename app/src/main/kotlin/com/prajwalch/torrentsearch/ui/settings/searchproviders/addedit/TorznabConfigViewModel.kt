@@ -13,8 +13,10 @@ import com.prajwalch.torrentsearch.providers.SearchProviderId
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -27,12 +29,18 @@ data class TorznabConfigUiState(
     val category: Category = Category.All,
     val isNewConfig: Boolean = true,
     val isUrlValid: Boolean = true,
-    val isConfigSaved: Boolean = false,
     val isConnectionCheckRunning: Boolean = false,
-    val connectionCheckResult: TorznabConnectionCheckResult? = null,
 ) {
     fun isConfigNotBlank() =
         searchProviderName.isNotBlank() && url.isNotBlank() && apiKey.isNotBlank()
+}
+
+sealed interface TorznabConfigEvent {
+    data object ConfigSaved : TorznabConfigEvent
+
+    data class ConnectionCheckCompleted(
+        val result: TorznabConnectionCheckResult,
+    ) : TorznabConfigEvent
 }
 
 @HiltViewModel
@@ -52,21 +60,22 @@ class TorznabConfigViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    private val _events = Channel<TorznabConfigEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
+
     init {
         searchProviderId?.let(::loadConfig)
     }
 
     private fun loadConfig(id: SearchProviderId) = viewModelScope.launch {
-        val existingConfig = searchProvidersRepository.findTorznabConfig(id = id) ?: return@launch
+        val config = searchProvidersRepository.findTorznabConfig(id = id) ?: return@launch
 
-        _uiState.update {
-            it.copy(
-                searchProviderName = existingConfig.searchProviderName,
-                url = existingConfig.url,
-                apiKey = existingConfig.apiKey,
-                category = existingConfig.category,
-            )
-        }
+        _uiState.value = TorznabConfigUiState(
+            searchProviderName = config.searchProviderName,
+            url = config.url,
+            apiKey = config.apiKey,
+            category = config.category,
+        )
     }
 
     fun setSearchProviderName(name: String) {
@@ -86,43 +95,35 @@ class TorznabConfigViewModel @Inject constructor(
     }
 
     fun checkConnection() {
+        _uiState.update { it.copy(isConnectionCheckRunning = false) }
+
+        if (!isUrlValid()) {
+            _uiState.update { it.copy(isUrlValid = false) }
+            return
+        }
+
+        _uiState.update {
+            it.copy(
+                isUrlValid = true,
+                isConnectionCheckRunning = true,
+            )
+        }
+
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    isConnectionCheckRunning = false,
-                    connectionCheckResult = null,
-                )
-            }
+            val connectionCheckResult = searchProvidersRepository
+                .checkTorznabConnection(url = _uiState.value.url, apiKey = _uiState.value.apiKey)
 
-            if (!isUrlValid()) {
-                _uiState.update { it.copy(isUrlValid = false) }
-                return@launch
-            }
-
-            _uiState.update { it.copy(isConnectionCheckRunning = true) }
-
-            val url = _uiState.value.url
-            val apiKey = _uiState.value.apiKey
-            val connectionCheckResult =
-                searchProvidersRepository.checkTorznabConnection(url = url, apiKey = apiKey)
-
-            _uiState.update {
-                it.copy(
-                    isUrlValid = true,
-                    isConnectionCheckRunning = false,
-                    connectionCheckResult = connectionCheckResult,
-                )
-            }
+            _uiState.update { it.copy(isConnectionCheckRunning = false) }
+            _events.send(TorznabConfigEvent.ConnectionCheckCompleted(connectionCheckResult))
         }
     }
 
     fun saveConfig() {
         if (!isUrlValid()) {
-            _uiState.update {
-                it.copy(isUrlValid = false, isConfigSaved = false)
-            }
+            _uiState.update { it.copy(isUrlValid = false) }
             return
         }
+        _uiState.update { it.copy(isUrlValid = true) }
 
         viewModelScope.launch {
             if (searchProviderId == null) {
@@ -130,8 +131,7 @@ class TorznabConfigViewModel @Inject constructor(
             } else {
                 updateConfig(searchProviderId)
             }
-
-            _uiState.update { it.copy(isUrlValid = true, isConfigSaved = true) }
+            _events.send(TorznabConfigEvent.ConfigSaved)
         }
     }
 
