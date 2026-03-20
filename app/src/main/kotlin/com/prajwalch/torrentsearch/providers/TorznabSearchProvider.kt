@@ -24,13 +24,13 @@ import java.net.ConnectException
 import java.net.UnknownHostException
 
 /**
- * Search provider (or indexer) specific category range start.
+ * Search provider (or indexer) custom category range start.
  *
  * Category IDs are divided into two groups i.e. predefined and custom.
  * Every client is required to use predefined category IDs whereas custom
- * varies for each indexer and it also depends on client implementation.
+ * varies for each indexer, and it also depends on the client implementation.
  *
- * Therefore, we only use predefined category range (1000-8999) to construct
+ * Therefore, we only use predefined category range (**1000-8999**) to construct
  * category IDs from the given [Category] during request and to detect the
  * [Category] of a torrent using IDs available in the response we receive.
  *
@@ -305,7 +305,7 @@ class TorznabSearchProvider(
 }
 
 /**
- * A XML parser for the response returned by the indexer.
+ * An XML parser for the response returned by the indexer.
  *
  * See [API spec](https://torznab.github.io/spec-1.3-draft/torznab/Specification-v1.3.html).
  */
@@ -578,7 +578,7 @@ private class TorznabCapabilitiesXmlParser {
     }
 }
 
-/** A XML parser for the error response. */
+/** An XML parser for the error response. */
 private class TorznabErrorResponseXmlParser {
     private val parser = Xml.newPullParser()
     private val namespace: String? = null
