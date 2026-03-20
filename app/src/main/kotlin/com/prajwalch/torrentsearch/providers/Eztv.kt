@@ -51,7 +51,7 @@ class Eztv : SearchProvider {
         //
         // To make sure we select the correct table, check the header has
         // expected data <td> or not.
-        val headerRow = tableRows[1] ?: return emptyList()
+        val headerRow = tableRows.getOrNull(1) ?: return emptyList()
         if (!validateHeader(headerRow)) {
             return emptyList()
         }
@@ -79,7 +79,7 @@ class Eztv : SearchProvider {
         // "Show"
         val firstTd = allTd.first() ?: return false
         // "Episode Name"
-        val secondTd = allTd[1] ?: return false
+        val secondTd = allTd.getOrNull(1) ?: return false
 
         return (firstTd.ownText() == "Show") && (secondTd.ownText() == "Episode Name")
     }

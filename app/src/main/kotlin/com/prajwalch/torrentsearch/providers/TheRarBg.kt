@@ -192,7 +192,7 @@ class TheRarBg : SearchProvider {
         val detailsPageHtml = httpClient.get(url = detailsPageUrl)
 
         return withContext(Dispatchers.Default) {
-            val html = Jsoup.parse(detailsPageHtml) ?: return@withContext null
+            val html = Jsoup.parse(detailsPageHtml)
 
             val magnetUri = html.selectFirst("a.magnet-btn")?.attr("href")
                 ?: return@withContext null

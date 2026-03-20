@@ -93,7 +93,8 @@ class XXXClub : SearchProvider {
         val responseHtml = httpClient.get(url = descriptionPageUrl)
 
         return withContext(Dispatchers.Default) {
-            val html = Jsoup.parse(responseHtml) ?: return@withContext null
+            val html = Jsoup.parse(responseHtml)
+            
             val magnetUri = html.selectFirst("""a[href^="magnet:"]""")?.attr("href")
                 ?: return@withContext null
             val fileDownloadLink =
