@@ -42,7 +42,6 @@ import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.ui.component.CategoryChipsRow
 import com.prajwalch.torrentsearch.ui.component.ExpandableSearchBar
-import com.prajwalch.torrentsearch.ui.component.SettingsIconButton
 import com.prajwalch.torrentsearch.ui.home.component.SearchHistoryList
 import com.prajwalch.torrentsearch.ui.theme.spaces
 
@@ -186,7 +185,12 @@ private fun HomeScreenTopBar(
                     )
                 }
             }
-            SettingsIconButton(onClick = onNavigateToSettings)
+            IconButton(modifier = modifier, onClick = onNavigateToSettings) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_settings),
+                    contentDescription = null,
+                )
+            }
         },
         scrollBehavior = scrollBehavior,
     )

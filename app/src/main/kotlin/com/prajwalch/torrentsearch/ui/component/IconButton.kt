@@ -78,13 +78,3 @@ fun SortIconButton(
         )
     }
 }
-
-@Composable
-fun SettingsIconButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    IconButton(modifier = modifier, onClick = onClick) {
-        Icon(
-            painter = painterResource(R.drawable.ic_settings),
-            contentDescription = null,
-        )
-    }
-}
