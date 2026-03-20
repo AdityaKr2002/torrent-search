@@ -357,6 +357,7 @@ private class TorznabResponseXmlParser(
         var descriptionPageUrl: String? = null
         var magnetUri: String? = null
         var infoHash: String? = null
+        var fileDownloadLink: String? = null
 
         val categoryIds = mutableSetOf<Int>()
 
@@ -366,6 +367,7 @@ private class TorznabResponseXmlParser(
                 "comments" -> descriptionPageUrl = readComments()
                 "pubDate" -> uploadDate = readPubDate()
                 "size" -> size = readSize()
+                "enclosure" if (fileDownloadLink == null) -> fileDownloadLink = readEnclosure()
                 // Torznab specific attributes.
                 //
                 // TODO: Attributes are optional so they are not guaranteed to always be present.
@@ -418,6 +420,7 @@ private class TorznabResponseXmlParser(
             category = category,
             descriptionPageUrl = descriptionPageUrl ?: return,
             infoHashOrMagnetUri = infoHashOrMagnetUri,
+            fileDownloadLink = fileDownloadLink,
         )
         torrents.add(torrent)
     }
@@ -460,6 +463,18 @@ private class TorznabResponseXmlParser(
         }
 
         return text
+    }
+
+    private fun readEnclosure(): String? {
+        parser.require(XmlPullParser.START_TAG, namespace, "enclosure")
+
+        val url: String? = parser.getAttributeValue(null, "url")
+        val type: String? = parser.getAttributeValue(null, "type")
+
+        parser.nextTag()
+        parser.require(XmlPullParser.END_TAG, namespace, "enclosure")
+
+        return if (type == "application/x-bittorrent") url else null
     }
 
     private fun readTorznabAttributeValue(): String {
