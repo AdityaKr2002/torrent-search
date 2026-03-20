@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.prajwalch.torrentsearch.data.repository.SettingsRepository
-import com.prajwalch.torrentsearch.domain.models.DarkTheme
+import com.prajwalch.torrentsearch.domain.model.DarkTheme
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 

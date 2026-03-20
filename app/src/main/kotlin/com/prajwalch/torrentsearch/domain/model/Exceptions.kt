@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.domain.models
+package com.prajwalch.torrentsearch.domain.model
 
 /** Base exception for all TorrentSearch exceptions. */
 sealed class TorrentSearchException(

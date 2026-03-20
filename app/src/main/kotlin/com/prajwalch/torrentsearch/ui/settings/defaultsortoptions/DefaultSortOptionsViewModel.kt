@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.prajwalch.torrentsearch.data.repository.SettingsRepository
-import com.prajwalch.torrentsearch.domain.models.SortCriteria
-import com.prajwalch.torrentsearch.domain.models.SortOptions
-import com.prajwalch.torrentsearch.domain.models.SortOrder
+import com.prajwalch.torrentsearch.domain.model.SortCriteria
+import com.prajwalch.torrentsearch.domain.model.SortOptions
+import com.prajwalch.torrentsearch.domain.model.SortOrder
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 

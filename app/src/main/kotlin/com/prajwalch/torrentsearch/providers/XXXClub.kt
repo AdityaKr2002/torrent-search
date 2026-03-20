@@ -1,8 +1,8 @@
 package com.prajwalch.torrentsearch.providers
 
-import com.prajwalch.torrentsearch.domain.models.Category
-import com.prajwalch.torrentsearch.domain.models.InfoHashOrMagnetUri
-import com.prajwalch.torrentsearch.domain.models.Torrent
+import com.prajwalch.torrentsearch.domain.model.Category
+import com.prajwalch.torrentsearch.domain.model.InfoHashOrMagnetUri
+import com.prajwalch.torrentsearch.domain.model.Torrent
 import com.prajwalch.torrentsearch.network.HttpClient
 
 import kotlinx.coroutines.Dispatchers
@@ -94,7 +94,7 @@ class XXXClub : SearchProvider {
 
         return withContext(Dispatchers.Default) {
             val html = Jsoup.parse(responseHtml)
-            
+
             val magnetUri = html.selectFirst("""a[href^="magnet:"]""")?.attr("href")
                 ?: return@withContext null
             val fileDownloadLink =

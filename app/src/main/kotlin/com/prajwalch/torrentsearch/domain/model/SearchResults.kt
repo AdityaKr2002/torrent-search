@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.domain.models
+package com.prajwalch.torrentsearch.domain.model
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

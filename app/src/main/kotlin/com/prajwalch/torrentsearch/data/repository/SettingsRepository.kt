@@ -8,12 +8,12 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 
-import com.prajwalch.torrentsearch.domain.models.Category
-import com.prajwalch.torrentsearch.domain.models.DarkTheme
-import com.prajwalch.torrentsearch.domain.models.MaxNumResults
-import com.prajwalch.torrentsearch.domain.models.SortCriteria
-import com.prajwalch.torrentsearch.domain.models.SortOptions
-import com.prajwalch.torrentsearch.domain.models.SortOrder
+import com.prajwalch.torrentsearch.domain.model.Category
+import com.prajwalch.torrentsearch.domain.model.DarkTheme
+import com.prajwalch.torrentsearch.domain.model.MaxNumResults
+import com.prajwalch.torrentsearch.domain.model.SortCriteria
+import com.prajwalch.torrentsearch.domain.model.SortOptions
+import com.prajwalch.torrentsearch.domain.model.SortOrder
 import com.prajwalch.torrentsearch.providers.SearchProviderId
 
 import kotlinx.coroutines.flow.Flow

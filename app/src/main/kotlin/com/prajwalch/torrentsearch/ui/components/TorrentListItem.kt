@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 
 import com.prajwalch.torrentsearch.R
-import com.prajwalch.torrentsearch.domain.models.Category
+import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.ui.theme.spaces
 
 @Composable

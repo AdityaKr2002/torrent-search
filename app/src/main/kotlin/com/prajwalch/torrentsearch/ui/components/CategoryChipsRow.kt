@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-import com.prajwalch.torrentsearch.domain.models.Category
+import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.ui.theme.spaces
 import com.prajwalch.torrentsearch.util.categoryStringResource
 

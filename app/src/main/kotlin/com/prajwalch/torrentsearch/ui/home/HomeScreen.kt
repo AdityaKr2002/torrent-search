@@ -40,9 +40,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.prajwalch.torrentsearch.R
-import com.prajwalch.torrentsearch.domain.models.Category
-import com.prajwalch.torrentsearch.domain.models.SearchHistory
-import com.prajwalch.torrentsearch.domain.models.SearchHistoryId
+import com.prajwalch.torrentsearch.domain.model.Category
+import com.prajwalch.torrentsearch.domain.model.SearchHistory
+import com.prajwalch.torrentsearch.domain.model.SearchHistoryId
 import com.prajwalch.torrentsearch.ui.components.CategoryChipsRow
 import com.prajwalch.torrentsearch.ui.components.ExpandableSearchBar
 import com.prajwalch.torrentsearch.ui.components.SearchHistoryList

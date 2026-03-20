@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.domain.models
+package com.prajwalch.torrentsearch.domain.model
 
 /** Result of the Torznab connection check. */
 sealed class TorznabConnectionCheckResult {

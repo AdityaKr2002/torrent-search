@@ -21,4 +21,4 @@
 #-renamesourcefileattribute SourceFile
 
 # Prevent R8 from minifying
--keep class com.prajwalch.torrentsearch.domain.models.Category { *; }
+-keep class com.prajwalch.torrentsearch.domain.model.Category { *; }
