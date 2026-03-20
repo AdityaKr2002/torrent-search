@@ -13,7 +13,7 @@ import com.prajwalch.torrentsearch.domain.models.Category
 import com.prajwalch.torrentsearch.domain.models.DarkTheme
 import com.prajwalch.torrentsearch.domain.models.MaxNumResults
 import com.prajwalch.torrentsearch.domain.models.SortOptions
-import com.prajwalch.torrentsearch.utils.LogsUtils
+import com.prajwalch.torrentsearch.util.LogsUtils
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 

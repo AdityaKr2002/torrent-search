@@ -25,7 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.domain.models.Category
 import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
-import com.prajwalch.torrentsearch.utils.categoryStringResource
+import com.prajwalch.torrentsearch.util.categoryStringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

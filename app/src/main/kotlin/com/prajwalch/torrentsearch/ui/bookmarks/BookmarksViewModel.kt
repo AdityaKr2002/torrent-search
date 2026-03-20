@@ -10,7 +10,7 @@ import com.prajwalch.torrentsearch.domain.models.SortOptions
 import com.prajwalch.torrentsearch.domain.models.SortOrder
 import com.prajwalch.torrentsearch.domain.models.Torrent
 import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloader
-import com.prajwalch.torrentsearch.utils.createSortComparator
+import com.prajwalch.torrentsearch.util.createSortComparator
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 

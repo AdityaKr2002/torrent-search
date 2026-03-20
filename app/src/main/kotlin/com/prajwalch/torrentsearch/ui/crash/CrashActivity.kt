@@ -13,8 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.ui.main.MainActivity
 import com.prajwalch.torrentsearch.ui.theme.TorrentSearchTheme
-import com.prajwalch.torrentsearch.utils.LogsUtils
-import com.prajwalch.torrentsearch.utils.TorrentSearchExceptionHandler
+import com.prajwalch.torrentsearch.util.LogsUtils
+import com.prajwalch.torrentsearch.util.TorrentSearchExceptionHandler
 
 import kotlinx.coroutines.launch
 

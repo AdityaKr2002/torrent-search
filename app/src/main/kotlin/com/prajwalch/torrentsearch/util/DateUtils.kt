@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.utils
+package com.prajwalch.torrentsearch.util
 
 object DateUtils {
     private val dateFormatter = TorrentSearchDateFormatter.init()

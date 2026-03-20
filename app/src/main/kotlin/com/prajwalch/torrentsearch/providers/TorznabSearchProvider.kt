@@ -10,7 +10,7 @@ import com.prajwalch.torrentsearch.domain.models.Torrent
 import com.prajwalch.torrentsearch.domain.models.TorznabConfig
 import com.prajwalch.torrentsearch.domain.models.TorznabConnectionCheckResult
 import com.prajwalch.torrentsearch.network.HttpClient
-import com.prajwalch.torrentsearch.utils.FileSizeUtils
+import com.prajwalch.torrentsearch.util.FileSizeUtils
 
 import io.ktor.client.statement.bodyAsText
 

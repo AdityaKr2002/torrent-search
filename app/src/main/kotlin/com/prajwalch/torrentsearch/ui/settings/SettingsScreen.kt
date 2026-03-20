@@ -61,10 +61,10 @@ import com.prajwalch.torrentsearch.ui.components.SettingsDialog
 import com.prajwalch.torrentsearch.ui.components.SettingsListItem
 import com.prajwalch.torrentsearch.ui.components.SettingsSectionTitle
 import com.prajwalch.torrentsearch.ui.theme.spaces
-import com.prajwalch.torrentsearch.utils.categoryStringResource
-import com.prajwalch.torrentsearch.utils.darkThemeStringResource
-import com.prajwalch.torrentsearch.utils.sortCriteriaStringResource
-import com.prajwalch.torrentsearch.utils.sortOrderStringResource
+import com.prajwalch.torrentsearch.util.categoryStringResource
+import com.prajwalch.torrentsearch.util.darkThemeStringResource
+import com.prajwalch.torrentsearch.util.sortCriteriaStringResource
+import com.prajwalch.torrentsearch.util.sortOrderStringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.utils
+package com.prajwalch.torrentsearch.util
 
 object FileSizeUtils {
     private const val KB: Float = 1024.0f

@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.utils
+package com.prajwalch.torrentsearch.util
 
 import com.prajwalch.torrentsearch.domain.models.SortCriteria
 import com.prajwalch.torrentsearch.domain.models.SortOrder

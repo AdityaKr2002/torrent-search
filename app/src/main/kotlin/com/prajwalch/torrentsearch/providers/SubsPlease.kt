@@ -9,8 +9,8 @@ import com.prajwalch.torrentsearch.domain.models.Torrent
 import com.prajwalch.torrentsearch.extensions.asObject
 import com.prajwalch.torrentsearch.extensions.getArray
 import com.prajwalch.torrentsearch.extensions.getString
-import com.prajwalch.torrentsearch.utils.DateUtils
-import com.prajwalch.torrentsearch.utils.FileSizeUtils
+import com.prajwalch.torrentsearch.util.DateUtils
+import com.prajwalch.torrentsearch.util.FileSizeUtils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

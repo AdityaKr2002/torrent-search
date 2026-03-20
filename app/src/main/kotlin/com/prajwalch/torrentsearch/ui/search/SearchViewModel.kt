@@ -17,7 +17,7 @@ import com.prajwalch.torrentsearch.domain.models.Torrent
 import com.prajwalch.torrentsearch.network.ConnectivityChecker
 import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloadState
 import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloader
-import com.prajwalch.torrentsearch.utils.createSortComparator
+import com.prajwalch.torrentsearch.util.createSortComparator
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 

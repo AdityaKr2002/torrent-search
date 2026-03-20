@@ -55,7 +55,7 @@ import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
 import com.prajwalch.torrentsearch.ui.components.BottomInfo
 import com.prajwalch.torrentsearch.ui.components.TextUrl
 import com.prajwalch.torrentsearch.ui.theme.spaces
-import com.prajwalch.torrentsearch.utils.categoryStringResource
+import com.prajwalch.torrentsearch.util.categoryStringResource
 
 @Composable
 fun AddEditSearchProviderScreen(

@@ -87,7 +87,7 @@ import com.prajwalch.torrentsearch.ui.components.rememberCollapsibleSearchBarSta
 import com.prajwalch.torrentsearch.ui.rememberTorrentListState
 import com.prajwalch.torrentsearch.ui.theme.TorrentSearchTheme
 import com.prajwalch.torrentsearch.ui.theme.spaces
-import com.prajwalch.torrentsearch.utils.categoryStringResource
+import com.prajwalch.torrentsearch.util.categoryStringResource
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

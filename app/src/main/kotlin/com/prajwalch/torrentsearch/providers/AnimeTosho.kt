@@ -3,7 +3,7 @@ package com.prajwalch.torrentsearch.providers
 import com.prajwalch.torrentsearch.domain.models.Category
 import com.prajwalch.torrentsearch.domain.models.InfoHashOrMagnetUri
 import com.prajwalch.torrentsearch.domain.models.Torrent
-import com.prajwalch.torrentsearch.utils.DateUtils
+import com.prajwalch.torrentsearch.util.DateUtils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

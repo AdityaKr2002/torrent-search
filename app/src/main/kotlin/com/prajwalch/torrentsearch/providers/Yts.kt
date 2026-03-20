@@ -1,16 +1,15 @@
 package com.prajwalch.torrentsearch.providers
 
+import com.prajwalch.torrentsearch.domain.models.Category
+import com.prajwalch.torrentsearch.domain.models.InfoHashOrMagnetUri
+import com.prajwalch.torrentsearch.domain.models.Torrent
 import com.prajwalch.torrentsearch.extensions.asObject
 import com.prajwalch.torrentsearch.extensions.getArray
 import com.prajwalch.torrentsearch.extensions.getLong
 import com.prajwalch.torrentsearch.extensions.getObject
 import com.prajwalch.torrentsearch.extensions.getString
 import com.prajwalch.torrentsearch.extensions.getUInt
-import com.prajwalch.torrentsearch.domain.models.Category
-import com.prajwalch.torrentsearch.domain.models.InfoHashOrMagnetUri
-import com.prajwalch.torrentsearch.domain.models.Torrent
-import com.prajwalch.torrentsearch.utils.DateUtils
-
+import com.prajwalch.torrentsearch.util.DateUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject

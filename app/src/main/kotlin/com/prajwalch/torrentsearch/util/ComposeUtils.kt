@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.utils
+package com.prajwalch.torrentsearch.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource

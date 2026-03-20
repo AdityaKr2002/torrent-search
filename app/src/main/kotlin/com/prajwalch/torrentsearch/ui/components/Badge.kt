@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.domain.models.Category
 import com.prajwalch.torrentsearch.ui.theme.spaces
-import com.prajwalch.torrentsearch.utils.categoryStringResource
+import com.prajwalch.torrentsearch.util.categoryStringResource
 
 @Composable
 fun CategoryBadge(category: Category, modifier: Modifier = Modifier) {

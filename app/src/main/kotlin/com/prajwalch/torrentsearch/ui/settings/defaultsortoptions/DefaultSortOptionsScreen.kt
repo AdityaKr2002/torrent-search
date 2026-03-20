@@ -28,8 +28,8 @@ import com.prajwalch.torrentsearch.domain.models.SortCriteria
 import com.prajwalch.torrentsearch.domain.models.SortOrder
 import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
 import com.prajwalch.torrentsearch.ui.components.SettingsSectionTitle
-import com.prajwalch.torrentsearch.utils.sortCriteriaStringResource
-import com.prajwalch.torrentsearch.utils.sortOrderStringResource
+import com.prajwalch.torrentsearch.util.sortCriteriaStringResource
+import com.prajwalch.torrentsearch.util.sortOrderStringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
