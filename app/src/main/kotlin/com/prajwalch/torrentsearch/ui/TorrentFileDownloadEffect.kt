@@ -7,7 +7,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 
+import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloadEvent
 import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloadState
 
@@ -31,6 +33,10 @@ fun TorrentFileDownloadEffect(
         fileUri?.let(contentResolver::openOutputStream)?.let(onWrite)
     }
 
+    val fileDownloadingMessage = stringResource(R.string.torrent_file_downloading_message)
+    val fileSavingMessage = stringResource(R.string.torrent_file_saving_message)
+    val fileSavedMessage = stringResource(R.string.torrent_file_saved_message)
+
     LaunchedEffect(Unit) {
         events.collect { event ->
             when (event) {
@@ -39,7 +45,7 @@ fun TorrentFileDownloadEffect(
                 }
 
                 TorrentFileDownloadEvent.WriteSucceed -> {
-                    snackbarHostState.showSnackbar("Contents write succeed")
+                    snackbarHostState.showSnackbar(message = fileSavedMessage)
                 }
             }
         }
@@ -53,14 +59,14 @@ fun TorrentFileDownloadEffect(
 
             TorrentFileDownloadState.Downloading -> {
                 snackbarHostState.showSnackbar(
-                    message = "Downloading .torrent file contents",
+                    message = fileDownloadingMessage,
                     duration = SnackbarDuration.Indefinite,
                 )
             }
 
             TorrentFileDownloadState.Writing -> {
                 snackbarHostState.showSnackbar(
-                    message = "Writing contents to file",
+                    message = fileSavingMessage,
                     duration = SnackbarDuration.Indefinite,
                 )
             }

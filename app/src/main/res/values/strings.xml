@@ -38,6 +38,10 @@
     <string name="torznab_conn_check_result_unexpected_response">Unexpected response (%1$d)</string>
     <string name="torznab_conn_check_result_unexpected_error">Unexpected error</string>
 
+    <string name="torrent_file_downloading_message">Downloading torrent file…</string>
+    <string name="torrent_file_saving_message">Saving torrent file…</string>
+    <string name="torrent_file_saved_message">Torrent file saved</string>
+
     <string name="crash_screen_title">Oops!</string>
     <string name="crash_screen_subtitle">
         %1$s hit an unexpected error. Please export the logs and create a Github issue with the logs attached.
