@@ -1,7 +1,6 @@
 package com.prajwalch.torrentsearch.ui.settings.searchproviders.addedit
 
 import android.content.Context
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,11 +50,11 @@ import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.constant.TorrentSearchConstants
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.TorznabConnectionCheckResult
+import com.prajwalch.torrentsearch.ui.categoryStringResource
 import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
 import com.prajwalch.torrentsearch.ui.components.BottomInfo
 import com.prajwalch.torrentsearch.ui.components.TextUrl
 import com.prajwalch.torrentsearch.ui.theme.spaces
-import com.prajwalch.torrentsearch.util.categoryStringResource
 
 @Composable
 fun AddEditSearchProviderScreen(

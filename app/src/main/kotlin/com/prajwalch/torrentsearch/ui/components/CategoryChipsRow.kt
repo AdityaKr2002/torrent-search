@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 import com.prajwalch.torrentsearch.domain.model.Category
+import com.prajwalch.torrentsearch.ui.categoryStringResource
 import com.prajwalch.torrentsearch.ui.theme.spaces
-import com.prajwalch.torrentsearch.util.categoryStringResource
 
 @Composable
 fun CategoryChipsRow(

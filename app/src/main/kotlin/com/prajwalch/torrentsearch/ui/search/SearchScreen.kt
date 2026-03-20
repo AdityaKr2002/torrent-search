@@ -70,6 +70,7 @@ import com.prajwalch.torrentsearch.domain.model.SearchException
 import com.prajwalch.torrentsearch.domain.model.Torrent
 import com.prajwalch.torrentsearch.extension.copyText
 import com.prajwalch.torrentsearch.ui.TorrentFileDownloadEffect
+import com.prajwalch.torrentsearch.ui.categoryStringResource
 import com.prajwalch.torrentsearch.ui.components.AnimatedScrollToTopFAB
 import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
 import com.prajwalch.torrentsearch.ui.components.BottomInfo
@@ -87,7 +88,6 @@ import com.prajwalch.torrentsearch.ui.components.rememberCollapsibleSearchBarSta
 import com.prajwalch.torrentsearch.ui.rememberTorrentListState
 import com.prajwalch.torrentsearch.ui.theme.TorrentSearchTheme
 import com.prajwalch.torrentsearch.ui.theme.spaces
-import com.prajwalch.torrentsearch.util.categoryStringResource
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

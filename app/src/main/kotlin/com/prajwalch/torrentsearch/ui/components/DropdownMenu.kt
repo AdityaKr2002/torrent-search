@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.domain.model.SortCriteria
 import com.prajwalch.torrentsearch.domain.model.SortOrder
-import com.prajwalch.torrentsearch.util.sortCriteriaStringResource
-import com.prajwalch.torrentsearch.util.sortOrderStringResource
+import com.prajwalch.torrentsearch.ui.sortCriteriaStringResource
+import com.prajwalch.torrentsearch.ui.sortOrderStringResource
 
 @Composable
 fun RoundedDropdownMenu(

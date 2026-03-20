@@ -55,16 +55,16 @@ import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.constant.TorrentSearchConstants
 import com.prajwalch.torrentsearch.domain.model.DarkTheme
 import com.prajwalch.torrentsearch.domain.model.MaxNumResults
+import com.prajwalch.torrentsearch.ui.categoryStringResource
 import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
 import com.prajwalch.torrentsearch.ui.components.RoundedDropdownMenu
 import com.prajwalch.torrentsearch.ui.components.SettingsDialog
 import com.prajwalch.torrentsearch.ui.components.SettingsListItem
 import com.prajwalch.torrentsearch.ui.components.SettingsSectionTitle
+import com.prajwalch.torrentsearch.ui.darkThemeStringResource
+import com.prajwalch.torrentsearch.ui.sortCriteriaStringResource
+import com.prajwalch.torrentsearch.ui.sortOrderStringResource
 import com.prajwalch.torrentsearch.ui.theme.spaces
-import com.prajwalch.torrentsearch.util.categoryStringResource
-import com.prajwalch.torrentsearch.util.darkThemeStringResource
-import com.prajwalch.torrentsearch.util.sortCriteriaStringResource
-import com.prajwalch.torrentsearch.util.sortOrderStringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
