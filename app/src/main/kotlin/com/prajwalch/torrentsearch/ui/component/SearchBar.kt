@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.ui.components
+package com.prajwalch.torrentsearch.ui.component
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent

@@ -56,11 +56,11 @@ import com.prajwalch.torrentsearch.constant.TorrentSearchConstants
 import com.prajwalch.torrentsearch.domain.model.DarkTheme
 import com.prajwalch.torrentsearch.domain.model.MaxNumResults
 import com.prajwalch.torrentsearch.ui.categoryStringResource
-import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
-import com.prajwalch.torrentsearch.ui.components.RoundedDropdownMenu
-import com.prajwalch.torrentsearch.ui.components.SettingsDialog
-import com.prajwalch.torrentsearch.ui.components.SettingsListItem
-import com.prajwalch.torrentsearch.ui.components.SettingsSectionTitle
+import com.prajwalch.torrentsearch.ui.component.ArrowBackIconButton
+import com.prajwalch.torrentsearch.ui.component.RoundedDropdownMenu
+import com.prajwalch.torrentsearch.ui.component.SettingsDialog
+import com.prajwalch.torrentsearch.ui.component.SettingsListItem
+import com.prajwalch.torrentsearch.ui.component.SettingsSectionTitle
 import com.prajwalch.torrentsearch.ui.darkThemeStringResource
 import com.prajwalch.torrentsearch.ui.sortCriteriaStringResource
 import com.prajwalch.torrentsearch.ui.sortOrderStringResource

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.constant.TorrentSearchConstants
-import com.prajwalch.torrentsearch.ui.components.StackTraceCard
+import com.prajwalch.torrentsearch.ui.component.StackTraceCard
 import com.prajwalch.torrentsearch.ui.theme.spaces
 
 @Composable

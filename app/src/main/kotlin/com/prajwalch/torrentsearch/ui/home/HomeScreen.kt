@@ -43,11 +43,11 @@ import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.SearchHistory
 import com.prajwalch.torrentsearch.domain.model.SearchHistoryId
-import com.prajwalch.torrentsearch.ui.components.CategoryChipsRow
-import com.prajwalch.torrentsearch.ui.components.ExpandableSearchBar
-import com.prajwalch.torrentsearch.ui.components.SearchHistoryList
-import com.prajwalch.torrentsearch.ui.components.SearchHistoryListItem
-import com.prajwalch.torrentsearch.ui.components.SettingsIconButton
+import com.prajwalch.torrentsearch.ui.component.CategoryChipsRow
+import com.prajwalch.torrentsearch.ui.component.ExpandableSearchBar
+import com.prajwalch.torrentsearch.ui.component.SearchHistoryList
+import com.prajwalch.torrentsearch.ui.component.SearchHistoryListItem
+import com.prajwalch.torrentsearch.ui.component.SettingsIconButton
 import com.prajwalch.torrentsearch.ui.theme.spaces
 
 import kotlinx.coroutines.flow.collectLatest

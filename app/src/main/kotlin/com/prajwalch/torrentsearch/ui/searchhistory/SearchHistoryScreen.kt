@@ -31,15 +31,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.domain.model.SearchHistory
 import com.prajwalch.torrentsearch.domain.model.SearchHistoryId
 import com.prajwalch.torrentsearch.extension.copyText
-import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
-import com.prajwalch.torrentsearch.ui.components.DeleteForeverIconButton
-import com.prajwalch.torrentsearch.ui.components.EmptyPlaceholder
-import com.prajwalch.torrentsearch.ui.components.SearchHistoryList
-import com.prajwalch.torrentsearch.ui.components.SearchHistoryListItem
+import com.prajwalch.torrentsearch.ui.component.ArrowBackIconButton
+import com.prajwalch.torrentsearch.ui.component.DeleteForeverIconButton
+import com.prajwalch.torrentsearch.ui.component.EmptyPlaceholder
+import com.prajwalch.torrentsearch.ui.component.SearchHistoryList
+import com.prajwalch.torrentsearch.ui.component.SearchHistoryListItem
+
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

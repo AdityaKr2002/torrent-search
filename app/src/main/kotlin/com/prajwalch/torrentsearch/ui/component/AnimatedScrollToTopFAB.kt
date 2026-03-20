@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.ui.components
+package com.prajwalch.torrentsearch.ui.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition

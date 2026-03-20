@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.ui.components
+package com.prajwalch.torrentsearch.ui.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState

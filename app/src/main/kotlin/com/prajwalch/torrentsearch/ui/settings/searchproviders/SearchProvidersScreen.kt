@@ -51,14 +51,14 @@ import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.providers.SearchProviderId
 import com.prajwalch.torrentsearch.providers.SearchProviderSafetyStatus
 import com.prajwalch.torrentsearch.providers.SearchProviderType
-import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
-import com.prajwalch.torrentsearch.ui.components.BadgesRow
-import com.prajwalch.torrentsearch.ui.components.CategoryBadge
-import com.prajwalch.torrentsearch.ui.components.CategoryChipsRow
-import com.prajwalch.torrentsearch.ui.components.RoundedDropdownMenu
-import com.prajwalch.torrentsearch.ui.components.TextUrl
-import com.prajwalch.torrentsearch.ui.components.TorznabBadge
-import com.prajwalch.torrentsearch.ui.components.UnsafeBadge
+import com.prajwalch.torrentsearch.ui.component.ArrowBackIconButton
+import com.prajwalch.torrentsearch.ui.component.BadgesRow
+import com.prajwalch.torrentsearch.ui.component.CategoryBadge
+import com.prajwalch.torrentsearch.ui.component.CategoryChipsRow
+import com.prajwalch.torrentsearch.ui.component.RoundedDropdownMenu
+import com.prajwalch.torrentsearch.ui.component.TextUrl
+import com.prajwalch.torrentsearch.ui.component.TorznabBadge
+import com.prajwalch.torrentsearch.ui.component.UnsafeBadge
 import com.prajwalch.torrentsearch.ui.theme.spaces
 
 @OptIn(ExperimentalMaterial3Api::class)

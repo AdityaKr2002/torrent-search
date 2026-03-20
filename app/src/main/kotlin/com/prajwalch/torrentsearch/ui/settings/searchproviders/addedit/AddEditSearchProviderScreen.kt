@@ -51,9 +51,9 @@ import com.prajwalch.torrentsearch.constant.TorrentSearchConstants
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.TorznabConnectionCheckResult
 import com.prajwalch.torrentsearch.ui.categoryStringResource
-import com.prajwalch.torrentsearch.ui.components.ArrowBackIconButton
-import com.prajwalch.torrentsearch.ui.components.BottomInfo
-import com.prajwalch.torrentsearch.ui.components.TextUrl
+import com.prajwalch.torrentsearch.ui.component.ArrowBackIconButton
+import com.prajwalch.torrentsearch.ui.component.BottomInfo
+import com.prajwalch.torrentsearch.ui.component.TextUrl
 import com.prajwalch.torrentsearch.ui.theme.spaces
 
 @Composable
