@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.constants
+package com.prajwalch.torrentsearch.constant
 
 import com.prajwalch.torrentsearch.BuildConfig
 
