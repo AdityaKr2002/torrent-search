@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -95,26 +96,37 @@ class SearchViewModel @Inject constructor(
         settingsRepository = settingsRepository,
     )
 
+    /**
+     * List of search providers name extracted from the search results.
+     */
+    private val availableSearchProviders = searchOrchestrator.searchResults
+        .map { it.successes.map { t -> t.providerName }.toSet() }
+
     val torrentFileDownloadState = torrentFileDownloader.state
     val torrentFileDownloadEvents = torrentFileDownloader.events
 
     val uiState = combine(
         searchOrchestrator.state,
-        searchResultsProcessor.state
-    ) { searchState, processedState ->
+        searchResultsProcessor.state,
+        availableSearchProviders,
+    ) { searchState, processedState, availableSearchProviders ->
         val resultsFilteredOut = when {
             searchState.isSearching -> false
             searchState.isRefreshing -> false
             searchState.resultsNotFound -> false
             else -> processedState.results.successes.isEmpty()
         }
+        val filterOptions = createFilterOptions(
+            providers = availableSearchProviders,
+            filters = processedState.filters,
+        )
 
         SearchUiState(
             searchQuery = searchQuery,
             searchCategory = searchCategory,
             searchResults = processedState.results,
             sortOptions = processedState.sortOptions,
-            filterOptions = processedState.filterOptions,
+            filterOptions = filterOptions,
             isLoading = searchState.isLoading,
             isSearching = searchState.isSearching,
             isRefreshing = searchState.isRefreshing,
@@ -138,6 +150,28 @@ class SearchViewModel @Inject constructor(
 
             searchOrchestrator.search(searchQuery, searchCategory)
         }
+    }
+
+    /**
+     * Creates a [FilterOptions] from the given list of search provider name
+     * and the filter values used by the [SearchResultsProcessor] during search
+     * results processing.
+     */
+    private fun createFilterOptions(
+        providers: Set<String>,
+        filters: SearchResultsProcessor.Filters,
+    ): FilterOptions {
+        val searchProvidersFilterOption = providers.map {
+            SearchProviderFilterOption(
+                searchProviderName = it,
+                selected = it !in filters.excludedProviders,
+            )
+        }
+
+        return FilterOptions(
+            searchProviders = searchProvidersFilterOption.toImmutableList(),
+            deadTorrents = filters.deadTorrents,
+        )
     }
 
     private fun saveSearchQuery() = viewModelScope.launch {
@@ -191,19 +225,6 @@ class SearchViewModel @Inject constructor(
             torrentFileDownloader.writeFile(outputStream = outputStream)
         }
     }
-
-    //    /** Creates search providers filter option from the given search results. */
-//    private fun createSearchProvidersFilterOption(
-//        searchResults: ImmutableList<Torrent>,
-//    ): ImmutableList<SearchProviderFilterOption> {
-//        return searchResults
-//            .asSequence()
-//            .distinctBy { it.providerName }
-//            .map { it.providerName }
-//            .sorted()
-//            .map { SearchProviderFilterOption(searchProviderName = it, selected = true) }
-//            .toImmutableList()
-//    }
 }
 
 /**
@@ -368,13 +389,20 @@ private class SearchResultsProcessor(
      */
     data class ProcessedState(
         val results: SearchResults,
-        val filterOptions: FilterOptions,
+        val filters: Filters,
         val sortOptions: SortOptions,
     )
 
-    // Transformation values.
-    private val filterQuery = MutableStateFlow("")
-    private val filterOptions = MutableStateFlow(FilterOptions())
+    /**
+     * Transformation parameters.
+     */
+    data class Filters(
+        val query: String = "",
+        val excludedProviders: Set<String> = emptySet(),
+        val deadTorrents: Boolean = true,
+    )
+
+    private val filters = MutableStateFlow(Filters())
     private val sortOptions = MutableStateFlow(SortOptions())
 
     /**
@@ -385,21 +413,19 @@ private class SearchResultsProcessor(
      */
     val state = combine(
         searchResults,
-        filterQuery,
-        filterOptions,
+        filters,
         sortOptions,
         settingsRepository.enableNSFWMode,
-    ) { searchResults, filterQuery, filters, sortOptions, nsfwModeEnabled ->
+    ) { searchResults, filters, sortOptions, nsfwModeEnabled ->
         val filteredResults = processSearchResults(
             rawSearchResults = searchResults,
-            filterQuery = filterQuery,
             filters = filters,
             sortOptions = sortOptions,
             nsfwModeEnabled = nsfwModeEnabled,
         )
         ProcessedState(
             results = filteredResults,
-            filterOptions = filters,
+            filters = filters,
             sortOptions = sortOptions,
         )
     }.flowOn(Dispatchers.Default)
@@ -409,15 +435,10 @@ private class SearchResultsProcessor(
      */
     private fun processSearchResults(
         rawSearchResults: SearchResults,
-        filterQuery: String,
-        filters: FilterOptions,
+        filters: Filters,
         sortOptions: SortOptions,
         nsfwModeEnabled: Boolean,
     ): SearchResults {
-        val enabledSearchProvidersName = filters
-            .searchProviders
-            .filter { it.selected }
-            .map { it.searchProviderName }
         val sortComparator = createSortComparator(
             criteria = sortOptions.criteria,
             order = sortOptions.order,
@@ -425,12 +446,10 @@ private class SearchResultsProcessor(
         val processedSuccesses = rawSearchResults
             .successes
             .asSequence()
-            .filter {
-                filters.searchProviders.isEmpty() || it.providerName in enabledSearchProvidersName
-            }
+            .filterNot { it.providerName in filters.excludedProviders }
             .filter { nsfwModeEnabled || !it.isNSFW() }
             .filter { filters.deadTorrents || !it.isDead() }
-            .filter { filterQuery.isBlank() || it.name.contains(filterQuery, ignoreCase = true) }
+            .filter { filters.query.isBlank() || it.name.contains(filters.query, true) }
             .sortedWith(comparator = sortComparator)
             .toImmutableList()
 
@@ -444,20 +463,22 @@ private class SearchResultsProcessor(
      * Shows only those search results that contains the given query.
      */
     fun updateFilterQuery(query: String) {
-        filterQuery.value = if (query.isNotBlank()) query.trim() else query
+        filters.update { it.copy(query = query.trim()) }
     }
 
     /**
-     * Shows or hides search results based on the given provider name.
+     * Shows or hides search results associated with the given provider name.
      */
     fun toggleSearchProviderResults(providerName: String) {
-        val currentSearchProvidersFilters = filterOptions.value.searchProviders
-        val updatedSearchProvidersFilters = currentSearchProvidersFilters
-            .map { if (it.searchProviderName == providerName) it.copy(selected = !it.selected) else it }
-            .toImmutableList()
-
-        filterOptions.update {
-            it.copy(searchProviders = updatedSearchProvidersFilters)
+        filters.update {
+            val newExclusions = if (providerName in it.excludedProviders) {
+                // Remove from exclusion list.
+                it.excludedProviders - providerName
+            } else {
+                // Exclude it.
+                it.excludedProviders + providerName
+            }
+            it.copy(excludedProviders = newExclusions)
         }
     }
 
@@ -465,9 +486,7 @@ private class SearchResultsProcessor(
      * Shows or hides dead torrents from search results.
      */
     fun toggleDeadTorrents() {
-        filterOptions.update {
-            it.copy(deadTorrents = !it.deadTorrents)
-        }
+        filters.update { it.copy(deadTorrents = !it.deadTorrents) }
     }
 
     /**
