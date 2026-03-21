@@ -1,5 +1,6 @@
 package com.prajwalch.torrentsearch.ui.settings.searchproviders
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -7,6 +8,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -23,9 +25,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.prajwalch.torrentsearch.R
+import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.providers.SearchProviderId
 import com.prajwalch.torrentsearch.ui.component.ArrowBackIconButton
+import com.prajwalch.torrentsearch.ui.component.CategoryChipsRow
 import com.prajwalch.torrentsearch.ui.settings.searchproviders.component.SearchProviderList
+import com.prajwalch.torrentsearch.ui.theme.spaces
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,16 +67,21 @@ fun SearchProvidersScreen(
             }
         },
     ) { innerPadding ->
-        SearchProviderList(
-            modifier = Modifier.padding(innerPadding),
-            contentPadding = PaddingValues(bottom = 80.dp),
-            searchProviders = uiState.searchProviders,
-            onEnableSearchProvider = viewModel::enableSearchProvider,
-            onEditConfig = onNavigateToEditSearchProvider,
-            onDeleteConfig = viewModel::deleteTorznabConfig,
-            selectedCategory = uiState.selectedCategory,
-            onCategoryClick = viewModel::toggleCategory,
-        )
+        Column(modifier = Modifier.padding(innerPadding)) {
+            CategoryChipsRow(
+                categories = Category.entries,
+                selectedCategory = uiState.selectedCategory,
+                onCategoryClick = viewModel::toggleCategory,
+                contentPadding = PaddingValues(horizontal = MaterialTheme.spaces.large),
+            )
+            SearchProviderList(
+                contentPadding = PaddingValues(bottom = 80.dp),
+                searchProviders = uiState.searchProviders,
+                onEnableSearchProvider = viewModel::enableSearchProvider,
+                onEditConfig = onNavigateToEditSearchProvider,
+                onDeleteConfig = viewModel::deleteTorznabConfig,
+            )
+        }
     }
 }
 
