@@ -1,7 +1,6 @@
 package com.prajwalch.torrentsearch.ui.search.component
 
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -38,7 +37,7 @@ fun FilterOptionsBottomSheet(
         onDismissRequest = onDismiss,
     ) {
         Column(modifier = Modifier.padding(bottom = MaterialTheme.spaces.large)) {
-            AnimatedVisibility(visible = filterOptions.searchProviders.isNotEmpty()) {
+            if (filterOptions.searchProviders.isNotEmpty()) {
                 FiltersSectionTitle(titleId = R.string.search_filters_section_search_providers)
                 SearchProvidersChipsRow(
                     modifier = Modifier.padding(horizontal = MaterialTheme.spaces.large),
@@ -47,6 +46,7 @@ fun FilterOptionsBottomSheet(
                     isSearching = isSearching,
                 )
             }
+
             FiltersSectionTitle(titleId = R.string.search_filters_section_additional_options)
             FlowRow(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spaces.large),
