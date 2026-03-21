@@ -70,9 +70,9 @@ fun SearchProviderListItem(
         onLongClick = longClickHandler,
     )
 
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         ListItem(
-            modifier = modifier.then(clickableModifier),
+            modifier = Modifier.then(clickableModifier),
             headlineContent = { Text(text = name) },
             supportingContent = {
                 Column(
