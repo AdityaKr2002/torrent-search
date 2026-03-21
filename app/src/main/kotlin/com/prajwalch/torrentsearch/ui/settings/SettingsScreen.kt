@@ -10,43 +10,31 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -57,14 +45,13 @@ import com.prajwalch.torrentsearch.domain.model.DarkTheme
 import com.prajwalch.torrentsearch.domain.model.MaxNumResults
 import com.prajwalch.torrentsearch.ui.categoryStringResource
 import com.prajwalch.torrentsearch.ui.component.ArrowBackIconButton
-import com.prajwalch.torrentsearch.ui.component.RoundedDropdownMenu
-import com.prajwalch.torrentsearch.ui.component.SettingsDialog
-import com.prajwalch.torrentsearch.ui.component.SettingsListItem
-import com.prajwalch.torrentsearch.ui.component.SettingsSectionTitle
 import com.prajwalch.torrentsearch.ui.darkThemeStringResource
+import com.prajwalch.torrentsearch.ui.settings.component.DarkThemeOptionsMenu
+import com.prajwalch.torrentsearch.ui.settings.component.MaxNumResultsDialog
+import com.prajwalch.torrentsearch.ui.settings.component.SettingsListItem
+import com.prajwalch.torrentsearch.ui.settings.component.SettingsSectionTitle
 import com.prajwalch.torrentsearch.ui.sortCriteriaStringResource
 import com.prajwalch.torrentsearch.ui.sortOrderStringResource
-import com.prajwalch.torrentsearch.ui.theme.spaces
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,9 +64,10 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val contentResolver = LocalContext.current.contentResolver
+
     val logsExportLocationChooser = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument(TorrentSearchConstants.LOGS_FILE_TYPE),
     ) { fileUri ->
@@ -166,6 +154,7 @@ private fun AppearanceSettings(
     Column(modifier = modifier) {
         SettingsSectionTitle(title = R.string.settings_section_appearance)
 
+        // Dynamic theme is available only on Android 12+.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             SettingsListItem(
                 onClick = { onEnableDynamicTheme(!uiState.enableDynamicTheme) },
@@ -182,35 +171,20 @@ private fun AppearanceSettings(
         }
 
         Box {
-            var menuExpanded by rememberSaveable(uiState.darkTheme) { mutableStateOf(false) }
+            var showDarkThemeOptions by rememberSaveable(uiState.darkTheme) { mutableStateOf(false) }
 
             SettingsListItem(
-                onClick = { menuExpanded = true },
+                onClick = { showDarkThemeOptions = true },
                 icon = R.drawable.ic_dark_mode,
                 headline = R.string.settings_dark_theme,
                 supportingContent = darkThemeStringResource(uiState.darkTheme),
             )
-
-            RoundedDropdownMenu(
-                expanded = menuExpanded,
-                onDismissRequest = { menuExpanded = false },
-                offset = DpOffset(x = 16.dp, y = 0.dp),
-            ) {
-                DarkTheme.entries.forEach {
-                    DropdownMenuItem(
-                        text = { Text(text = darkThemeStringResource(it)) },
-                        onClick = { onSetDarkTheme(it) },
-                        leadingIcon = {
-                            if (it == uiState.darkTheme) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_check),
-                                    contentDescription = null,
-                                )
-                            }
-                        },
-                    )
-                }
-            }
+            DarkThemeOptionsMenu(
+                expanded = showDarkThemeOptions,
+                onDismiss = { showDarkThemeOptions = false },
+                selectedOption = uiState.darkTheme,
+                onOptionSelect = onSetDarkTheme,
+            )
         }
 
         SettingsListItem(
@@ -221,7 +195,7 @@ private fun AppearanceSettings(
             trailingContent = {
                 Switch(
                     checked = uiState.pureBlack,
-                    onCheckedChange = { onEnablePureBlackTheme(it) },
+                    onCheckedChange = onEnablePureBlackTheme,
                 )
             },
         )
@@ -237,6 +211,7 @@ private fun GeneralSettings(
     Column(modifier = modifier) {
         SettingsSectionTitle(title = R.string.settings_section_general)
 
+        // Per-app language preferences is available only on Android 13+.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val context = LocalContext.current
 
@@ -261,7 +236,7 @@ private fun GeneralSettings(
             trailingContent = {
                 Switch(
                     checked = uiState.enableNSFWMode,
-                    onCheckedChange = { onEnableNSFWMode(it) },
+                    onCheckedChange = onEnableNSFWMode,
                 )
             },
         )
@@ -278,15 +253,14 @@ private fun SearchSettings(
     modifier: Modifier = Modifier,
 ) {
     var showMaxNumResultsDialog by rememberSaveable { mutableStateOf(false) }
-
     if (showMaxNumResultsDialog) {
         MaxNumResultsDialog(
-            onDismissRequest = { showMaxNumResultsDialog = false },
+            onDismiss = { showMaxNumResultsDialog = false },
             num = if (uiState.maxNumResults.isUnlimited()) null else uiState.maxNumResults.n,
             onNumChange = { onSetMaxNumResults(MaxNumResults(n = it)) },
             onUnlimitedClick = {
-                showMaxNumResultsDialog = false
                 onSetMaxNumResults(MaxNumResults.Unlimited)
+                showMaxNumResultsDialog = false
             },
         )
     }
@@ -366,7 +340,7 @@ private fun SearchHistorySettings(
             trailingContent = {
                 Switch(
                     checked = uiState.saveSearchHistory,
-                    onCheckedChange = { onEnableSaveSearchHistory(it) },
+                    onCheckedChange = onEnableSaveSearchHistory,
                 )
             },
         )
@@ -378,7 +352,7 @@ private fun SearchHistorySettings(
             trailingContent = {
                 Switch(
                     checked = uiState.showSearchHistory,
-                    onCheckedChange = { onEnableShowSearchHistory(it) },
+                    onCheckedChange = onEnableShowSearchHistory,
                 )
             },
         )
@@ -466,58 +440,6 @@ private fun About(modifier: Modifier = Modifier) {
                 )
             },
         )
-    }
-}
-
-@Composable
-private fun MaxNumResultsDialog(
-    onDismissRequest: () -> Unit,
-    num: Int?,
-    onNumChange: (Int) -> Unit,
-    onUnlimitedClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    sliderRange: ClosedFloatingPointRange<Float> = 10f..100f,
-    incrementBy: Int = 5,
-) {
-    var sliderValue by rememberSaveable(num) {
-        mutableFloatStateOf(num?.toFloat() ?: sliderRange.start)
-    }
-
-    SettingsDialog(
-        modifier = modifier,
-        onDismissRequest = onDismissRequest,
-        title = R.string.settings_max_num_results,
-        confirmButton = {
-            TextButton(onClick = {
-                onDismissRequest()
-                onNumChange(sliderValue.toInt())
-            }) {
-                Text(text = stringResource(R.string.button_done))
-            }
-        },
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = stringResource(
-                    R.string.settings_max_num_results_summary_format,
-                    sliderValue.toInt()
-                ),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            Spacer(modifier = Modifier.height(MaterialTheme.spaces.large))
-            Slider(
-                value = sliderValue,
-                onValueChange = { sliderValue = (it / incrementBy) * incrementBy },
-                valueRange = sliderRange,
-                steps = ((sliderRange.endInclusive - sliderRange.start) / incrementBy).toInt() - 1,
-            )
-            OutlinedButton(onClick = onUnlimitedClick) {
-                Text(text = stringResource(R.string.settings_max_num_results_button_unlimited))
-            }
-        }
     }
 }
 
