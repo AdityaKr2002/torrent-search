@@ -209,7 +209,7 @@ fun SearchScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    onTryAgain = viewModel::reload,
+                    onTryAgain = viewModel::search,
                 )
             }
 
@@ -218,7 +218,7 @@ fun SearchScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    onTryAgain = viewModel::reload,
+                    onTryAgain = viewModel::search,
                 )
             }
 

@@ -174,7 +174,7 @@ class SearchViewModel @Inject constructor(
             resultsProcessor.updateSortCriteria(defaultSortOptions.criteria)
             resultsProcessor.updateSortOrder(defaultSortOptions.order)
 
-            searchOrchestrator.search(searchQuery, searchCategory)
+            search()
         }
     }
 
@@ -206,12 +206,12 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun refreshSearchResults() {
-        searchOrchestrator.refresh(searchQuery, searchCategory)
+    fun search() {
+        searchOrchestrator.search(searchQuery, searchCategory)
     }
 
-    fun reload() {
-        searchOrchestrator.search(searchQuery, searchCategory)
+    fun refreshSearchResults() {
+        searchOrchestrator.refresh(searchQuery, searchCategory)
     }
 
     fun filterSearchResults(query: String) {
