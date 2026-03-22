@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
@@ -46,6 +47,8 @@ import kotlinx.coroutines.launch
 
 import java.io.OutputStream
 import javax.inject.Inject
+
+import kotlin.time.Duration.Companion.seconds
 
 data class SearchUiState(
     val searchQuery: String = "",
@@ -162,7 +165,7 @@ class SearchViewModel @Inject constructor(
         )
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(5.seconds),
         initialValue = SearchUiState(isLoading = true),
     )
 
