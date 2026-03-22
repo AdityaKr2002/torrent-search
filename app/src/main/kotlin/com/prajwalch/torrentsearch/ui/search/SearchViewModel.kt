@@ -322,7 +322,7 @@ private class SearchOrchestrator(
         searchJob = scope.launch {
             _searchState.value = SearchState(isLoading = true)
 
-            if (!isInternetAvailable()) {
+            if (!connectivityChecker.isInternetAvailable()) {
                 _searchState.update { it.copy(isLoading = false, isInternetError = true) }
                 return@launch
             }
@@ -339,20 +339,13 @@ private class SearchOrchestrator(
         searchJob = scope.launch {
             _searchState.update { it.copy(isRefreshing = true) }
 
-            if (!isInternetAvailable()) {
+            if (!connectivityChecker.isInternetAvailable()) {
                 _searchState.update { it.copy(isRefreshing = false) }
                 return@launch
             }
 
             executeSearch(query = query, category = category)
         }
-    }
-
-    /**
-     * Returns `true` if the internet is available for performing a search.
-     */
-    private suspend fun isInternetAvailable(): Boolean {
-        return connectivityChecker.isInternetAvailable()
     }
 
     /**
