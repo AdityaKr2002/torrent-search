@@ -116,14 +116,6 @@ class SearchViewModel @Inject constructor(
     )
 
     /**
-     * List of search providers name extracted from the search results.
-     */
-    private val availableSearchProviders: Flow<Set<String>> =
-        searchOrchestrator.searchResults.map {
-            it.successes.map { torrent -> torrent.providerName }.toSet()
-        }
-
-    /**
      * The globally observable, read-only state of the torrent file downloader.
      */
     val torrentFileDownloadState: StateFlow<TorrentFileDownloadState> =
@@ -142,7 +134,7 @@ class SearchViewModel @Inject constructor(
         searchOrchestrator.searchState,
         resultsProcessor.processorState,
         resultsProcessor.processedSearchResults,
-        availableSearchProviders,
+        resultsProcessor.availableSearchProviders,
     ) { searchState, processorState, processedResults, availableSearchProviders ->
         val resultsFilteredOut = when {
             searchState.isSearching -> false
@@ -461,6 +453,13 @@ private class SearchResultsProcessor(
             settingsRepository.enableNSFWMode,
             ::processSearchResults
         ).flowOn(Dispatchers.Default)
+
+    /**
+     * List of search providers name extracted from the search results.
+     */
+    val availableSearchProviders: Flow<Set<String>> = searchResults.map {
+        it.successes.map { torrent -> torrent.providerName }.toSet()
+    }
 
     /**
      * Processes and returns a new search results based on the given values.
