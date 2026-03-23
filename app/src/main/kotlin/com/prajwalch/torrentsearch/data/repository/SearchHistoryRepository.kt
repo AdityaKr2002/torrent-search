@@ -17,6 +17,11 @@ class SearchHistoryRepository @Inject constructor(private val dao: SearchHistory
         return dao.getAllSearchHistories().map { it.toDomain() }
     }
 
+    /** Returns all the saved search history that contains the given term. */
+    fun getSearchHistoriesByTerm(term: String): Flow<List<SearchHistory>> {
+        return dao.getSearchHistoriesByTerm(term).map { it.toDomain() }
+    }
+
     /**
      * Adds the given search history otherwise does noting if the query
      * is already saved.

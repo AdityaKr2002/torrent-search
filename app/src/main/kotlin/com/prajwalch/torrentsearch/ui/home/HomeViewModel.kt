@@ -9,13 +9,17 @@ import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.SearchHistory
 
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -29,27 +33,76 @@ data class HomeUiState(
     val searchHistoryEnabled: Boolean = true,
 )
 
-private data class HomeSettings(
-    val enableNSFWMode: Boolean,
-    val saveSearchHistory: Boolean,
-    val showSearchHistory: Boolean,
-)
-
+/**
+ * The ViewModel which handles the business logic of home screen.
+ */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     searchHistoryRepository: SearchHistoryRepository,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
+    /**
+     * The internal source for the current search query used only for
+     * filtering search histories.
+     *
+     * UI maintains the query by itself but notifies the ViewModel whenever the
+     * query changes. We then update this flow with copy of the query.
+     */
     private val searchQuery = MutableStateFlow("")
+
+    /**
+     * The primary asynchronous stream of [SearchHistory].
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val searchHistories: Flow<List<SearchHistory>> =
+        combine(
+            searchQuery,
+            settingsRepository.showSearchHistory,
+            ::Pair,
+        ).flatMapLatest { (query, showSearchHistory) ->
+            when {
+                // Avoid fetching histories when not needed.
+                !showSearchHistory -> flowOf(emptyList())
+                query.isBlank() -> searchHistoryRepository.getAllSearchHistories()
+                else -> searchHistoryRepository.getSearchHistoriesByTerm(query)
+            }
+        }
+
+    /**
+     * The primary asynchronous stream of selectable [Category].
+     */
+    private val selectableCategories: Flow<List<Category>> =
+        settingsRepository.enableNSFWMode.map { nsfwModeEnabled ->
+            Category.entries.filter { nsfwModeEnabled || !it.isNSFW }
+        }
+
+    /**
+     * The internal, primary mutable source for the currently selected
+     * category. The flow is updated on demand from the UI.
+     */
     private val selectedCategory = MutableStateFlow(Category.All)
 
+    /**
+     * The primary read-only UI state.
+     */
     val uiState = combine(
-        searchQuery,
+        searchHistories,
+        selectableCategories,
         selectedCategory,
-        searchHistoryRepository.getAllSearchHistories(),
-        settingsRepository.getHomeSettings(),
-        ::createUiState,
-    ).stateIn(
+        settingsRepository.saveSearchHistory,
+    ) { histories, selectableCategories, selectedCategory, searchHistoryEnabled ->
+        val selectedCategory = when {
+            selectedCategory in selectableCategories -> selectedCategory
+            else -> Category.All
+        }
+
+        HomeUiState(
+            histories = histories,
+            categories = selectableCategories,
+            selectedCategory = selectedCategory,
+            searchHistoryEnabled = searchHistoryEnabled,
+        )
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5.seconds),
         initialValue = HomeUiState(),
@@ -59,32 +112,9 @@ class HomeViewModel @Inject constructor(
         loadDefaultCategory()
     }
 
-    private fun createUiState(
-        searchQuery: String,
-        selectedCategory: Category,
-        histories: List<SearchHistory>,
-        settings: HomeSettings,
-    ): HomeUiState {
-        val histories = when {
-            !settings.showSearchHistory -> emptyList()
-            searchQuery.isBlank() -> histories
-            else -> histories.filter { it.query.contains(searchQuery, ignoreCase = true) }
-        }
-
-        val categories = Category.entries.filter { settings.enableNSFWMode || !it.isNSFW }
-        val selectedCategory = when {
-            selectedCategory in categories -> selectedCategory
-            else -> Category.All
-        }
-
-        return HomeUiState(
-            histories = histories,
-            categories = categories,
-            selectedCategory = selectedCategory,
-            searchHistoryEnabled = settings.saveSearchHistory,
-        )
-    }
-
+    /**
+     * Loads the user-defined default category.
+     */
     private fun loadDefaultCategory() = viewModelScope.launch {
         val defaultCategory = settingsRepository.defaultCategory.firstOrNull()
 
@@ -93,19 +123,17 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Sets the currently selected category to given one.
+     */
     fun setCategory(category: Category) {
         selectedCategory.value = category
     }
 
+    /**
+     * Filters search histories by the given query.
+     */
     fun filterSearchHistories(query: String) {
         searchQuery.value = query
     }
-
-    private fun SettingsRepository.getHomeSettings(): Flow<HomeSettings> =
-        combine(
-            this.enableNSFWMode,
-            this.saveSearchHistory,
-            this.showSearchHistory,
-            ::HomeSettings,
-        )
 }
