@@ -7,7 +7,6 @@ import com.prajwalch.torrentsearch.data.repository.SearchHistoryRepository
 import com.prajwalch.torrentsearch.data.repository.SettingsRepository
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.SearchHistory
-import com.prajwalch.torrentsearch.domain.model.SearchHistoryId
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +37,7 @@ private data class HomeSettings(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val searchHistoryRepository: SearchHistoryRepository,
+    searchHistoryRepository: SearchHistoryRepository,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
     private val searchQuery = MutableStateFlow("")
@@ -100,12 +99,6 @@ class HomeViewModel @Inject constructor(
 
     fun filterSearchHistories(query: String) {
         searchQuery.value = query
-    }
-
-    fun deleteSearchHistory(id: SearchHistoryId) {
-        viewModelScope.launch {
-            searchHistoryRepository.deleteSearchHistoryById(id = id)
-        }
     }
 
     private fun SettingsRepository.getHomeSettings(): Flow<HomeSettings> =

@@ -134,7 +134,6 @@ fun HomeScreen(
                         coroutineScope.launch { searchBarState.animateToCollapsed() }
                     },
                     onInsertQuery = textFieldState::setTextAndPlaceCursorAtEnd,
-                    onDeleteSearchHistory = viewModel::deleteSearchHistory,
                 )
             }
 
