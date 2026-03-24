@@ -1,5 +1,6 @@
 package com.prajwalch.torrentsearch.ui.main
 
+import android.app.SearchManager
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
@@ -73,25 +74,20 @@ class MainActivity : ComponentActivity() {
      * is supported and contains a valid text.
      */
     private fun getInitialSearchQuery(): String? {
-        Log.d(TAG, "getInitialSearchQuery")
-        // Not started by any intent.
-        if (intent == null) {
-            Log.d(TAG, "Activity not started by any intent")
-            return null
-        }
+        Log.d(TAG, "getInitialSearchQuery [action = ${intent.action}, type = ${intent.type}]")
 
-        val action = intent.action
-        val type = intent.type
-        Log.d(TAG, "Received action $action and type $type")
+        val textReceivedFromIntent = when (intent.action) {
+            Intent.ACTION_SEARCH -> intent.getStringExtra(SearchManager.QUERY)
 
-        if (type != "text/plain") {
-            return null
-        }
+            Intent.ACTION_SEND if (intent.type == PLAIN_TEXT_MIME_TYPE) -> {
+                intent.getStringExtra(Intent.EXTRA_TEXT)
+            }
 
-        val textReceivedFromIntent = when (action) {
-            Intent.ACTION_SEND -> intent.getStringExtra(Intent.EXTRA_TEXT)
-            Intent.ACTION_PROCESS_TEXT -> intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
-            else -> null
+            Intent.ACTION_PROCESS_TEXT if (intent.type == PLAIN_TEXT_MIME_TYPE) -> {
+                intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
+            }
+
+            else -> return null
         }
 
         if (textReceivedFromIntent == null) {
@@ -197,5 +193,6 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         private const val TAG = "MainActivity"
+        private const val PLAIN_TEXT_MIME_TYPE = "text/plain"
     }
 }
