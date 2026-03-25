@@ -1,6 +1,7 @@
 package com.prajwalch.torrentsearch.ui.search.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -26,6 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 
 import com.prajwalch.torrentsearch.R
+import com.prajwalch.torrentsearch.domain.model.Category
+import com.prajwalch.torrentsearch.ui.categoryStringResource
+import com.prajwalch.torrentsearch.ui.component.RoundedDropdownMenu
 import com.prajwalch.torrentsearch.ui.search.FilterOptions
 import com.prajwalch.torrentsearch.ui.search.SearchProviderFilterOption
 import com.prajwalch.torrentsearch.ui.theme.spaces
@@ -37,9 +42,11 @@ fun SearchResultsFilter(
     filterOptions: FilterOptions,
     onToggleDeadTorrents: () -> Unit,
     onToggleSearchProvider: (providerName: String) -> Unit,
+    onUpdateCategory: (Category) -> Unit,
     modifier: Modifier = Modifier,
     enableDeadTorrentsFilter: Boolean = true,
     enableSearchProvidersFilter: Boolean = true,
+    enableCategoryFilter: Boolean = true,
 ) {
     val numSelectedSearchProviders = rememberSaveable(filterOptions.searchProviders) {
         filterOptions.searchProviders.count { it.selected }
@@ -51,6 +58,14 @@ fun SearchResultsFilter(
             onDismiss = { showSearchProvidersFilter = false },
             filterOptions = filterOptions.searchProviders,
             onToggleSearchProvider = onToggleSearchProvider,
+        )
+    }
+
+    val arrowDownIcon: @Composable () -> Unit = @Composable {
+        Icon(
+            modifier = Modifier.size(FilterChipDefaults.IconSize),
+            painter = painterResource(R.drawable.ic_keyboard_arrow_down),
+            contentDescription = null,
         )
     }
 
@@ -83,15 +98,32 @@ fun SearchResultsFilter(
                 selected = selected,
                 onClick = { showSearchProvidersFilter = true },
                 label = { Text(text = label) },
-                trailingIcon = {
-                    Icon(
-                        modifier = Modifier.size(FilterChipDefaults.IconSize),
-                        painter = painterResource(R.drawable.ic_keyboard_arrow_down),
-                        contentDescription = null,
-                    )
-                },
+                trailingIcon = arrowDownIcon,
                 enabled = enableSearchProvidersFilter,
             )
+        }
+
+        item(key = "category", contentType = filterOptions.category) {
+            val isDefaultCategorySelected = filterOptions.category == Category.All
+            var showCategoryOptions by rememberSaveable(filterOptions.category) {
+                mutableStateOf(false)
+            }
+
+            Box {
+                FilterChip(
+                    selected = !isDefaultCategorySelected,
+                    onClick = { showCategoryOptions = true },
+                    label = { Text(text = categoryStringResource(filterOptions.category)) },
+                    trailingIcon = arrowDownIcon,
+                    enabled = enableCategoryFilter,
+                )
+                CategoryOptionsDropdownMenu(
+                    expanded = showCategoryOptions,
+                    onDismiss = { showCategoryOptions = false },
+                    selectedCategory = filterOptions.category,
+                    onCategorySelect = onUpdateCategory,
+                )
+            }
         }
     }
 }
@@ -139,6 +171,36 @@ private fun SearchProvidersChipRow(
                 selected = it.selected,
                 onClick = { onToggleSearchProvider(it.searchProviderName) },
                 label = { Text(text = it.searchProviderName) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoryOptionsDropdownMenu(
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    selectedCategory: Category,
+    onCategorySelect: (Category) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    RoundedDropdownMenu(
+        modifier = modifier,
+        expanded = expanded,
+        onDismissRequest = onDismiss,
+    ) {
+        Category.entries.forEach {
+            DropdownMenuItem(
+                text = { Text(text = categoryStringResource(it)) },
+                onClick = { onCategorySelect(it) },
+                trailingIcon = {
+                    if (it == selectedCategory) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_check),
+                            contentDescription = null,
+                        )
+                    }
+                },
             )
         }
     }

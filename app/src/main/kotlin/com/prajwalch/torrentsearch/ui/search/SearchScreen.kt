@@ -38,6 +38,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import com.prajwalch.torrentsearch.R
+import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.MagnetUri
 import com.prajwalch.torrentsearch.domain.model.SortCriteria
 import com.prajwalch.torrentsearch.domain.model.SortOrder
@@ -242,8 +243,12 @@ fun SearchScreen(
                         filterOptions = uiState.filterOptions,
                         onToggleDeadTorrents = viewModel::toggleDeadTorrents,
                         onToggleSearchProvider = viewModel::toggleSearchProviderResults,
+                        onUpdateCategory = viewModel::updateCategoryFilter,
                         enableSearchProvidersFilter = !uiState.isSearching &&
                                 uiState.filterOptions.searchProviders.isNotEmpty(),
+                        // Enable only when there is a chance of receiving mixed category results,
+                        // which is always the case when using `All`.
+                        enableCategoryFilter = uiState.searchCategory == Category.All,
                     )
                     SearchResults(
                         searchResults = uiState.searchResults.successes,

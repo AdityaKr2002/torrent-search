@@ -68,6 +68,7 @@ data class SearchUiState(
 data class FilterOptions(
     val searchProviders: ImmutableList<SearchProviderFilterOption> = persistentListOf(),
     val deadTorrents: Boolean = true,
+    val category: Category = Category.All,
 )
 
 data class SearchProviderFilterOption(
@@ -116,6 +117,7 @@ class SearchViewModel @Inject constructor(
     private val resultsProcessor = SearchResultsProcessor(
         searchResults = searchOrchestrator.searchResults,
         settingsRepository = settingsRepository,
+        initialSelectedCategory = searchCategory,
     )
 
     /**
@@ -200,6 +202,7 @@ class SearchViewModel @Inject constructor(
         return FilterOptions(
             searchProviders = searchProvidersFilterOption.toImmutableList(),
             deadTorrents = filters.deadTorrents,
+            category = filters.category,
         )
     }
 
@@ -235,6 +238,10 @@ class SearchViewModel @Inject constructor(
 
     fun toggleDeadTorrents() {
         resultsProcessor.toggleDeadTorrents()
+    }
+
+    fun updateCategoryFilter(category: Category) {
+        resultsProcessor.updateCategory(category)
     }
 
     fun bookmarkTorrent(torrent: Torrent) {
@@ -405,6 +412,10 @@ private class SearchResultsProcessor(
      * The repository for fetching the user-defined transformation options.
      */
     settingsRepository: SettingsRepository,
+    /**
+     * The [Category] to use as an initial value for [Filters.category].
+     */
+    initialSelectedCategory: Category = Category.All,
 ) {
     /**
      * Represents the current state of processor.
@@ -421,12 +432,13 @@ private class SearchResultsProcessor(
         val query: String = "",
         val excludedProviders: Set<String> = emptySet(),
         val deadTorrents: Boolean = true,
+        val category: Category = Category.All,
     )
 
     /**
      * The internal mutable source for filters.
      */
-    private val filters = MutableStateFlow(Filters())
+    private val filters = MutableStateFlow(Filters(category = initialSelectedCategory))
 
     /**
      * The internal mutable source for sort options.
@@ -477,6 +489,7 @@ private class SearchResultsProcessor(
             .filter { nsfwModeEnabled || !it.isNSFW() }
             .filter { filters.deadTorrents || !it.isDead() }
             .filter { filters.query.isBlank() || it.name.contains(filters.query, true) }
+            .filter { filters.category == Category.All || filters.category == it.category }
             .sortedWith(comparator = sortComparator)
             .toImmutableList()
 
@@ -514,6 +527,13 @@ private class SearchResultsProcessor(
      */
     fun toggleDeadTorrents() {
         filters.update { it.copy(deadTorrents = !it.deadTorrents) }
+    }
+
+    /**
+     * Updates the current category with the given one.
+     */
+    fun updateCategory(category: Category) {
+        filters.update { it.copy(category = category) }
     }
 
     /**
