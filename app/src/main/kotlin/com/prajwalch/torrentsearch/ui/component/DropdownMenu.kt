@@ -67,7 +67,6 @@ fun SortDropdownMenu(
 ) {
     val checkIcon: @Composable () -> Unit = @Composable {
         Icon(
-            modifier = modifier,
             painter = painterResource(R.drawable.ic_check),
             contentDescription = null,
         )
