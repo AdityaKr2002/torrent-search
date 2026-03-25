@@ -38,9 +38,7 @@
     <string name="home_search_query_hint">搜索……</string>
     <string name="home_button_search">搜索</string>
     <string name="search_query_hint">搜索结果</string>
-    <string name="search_action_filter">过滤</string>
-    <string name="search_filters_section_search_providers">搜索源</string>
-    <string name="search_filters_section_additional_options">附加选项</string>
+    <string name="search_providers_filter_bottom_sheet_title">搜索源</string>
     <string name="search_filters_dead_torrents">死种</string>
     <string name="search_internet_connection_error">无网络连接</string>
     <string name="search_button_try_again">重试</string>

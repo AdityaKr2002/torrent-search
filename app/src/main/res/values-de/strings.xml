@@ -43,9 +43,7 @@
     <string name="home_search_query_hint">Suche…</string>
     <string name="home_button_search">Suche</string>
     <string name="search_query_hint">Suchergebnisse</string>
-    <string name="search_action_filter">Filter</string>
-    <string name="search_filters_section_search_providers">Suchanbieter</string>
-    <string name="search_filters_section_additional_options">Weitere Optionen</string>
+    <string name="search_providers_filter_bottom_sheet_title">Suchanbieter</string>
     <string name="search_filters_dead_torrents">Tote Torrents</string>
     <string name="search_internet_connection_error">Keine Internet Verbindung</string>
     <string name="search_button_try_again">Erneut versuchen</string>

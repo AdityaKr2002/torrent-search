@@ -31,8 +31,7 @@
     <string name="home_search_query_hint">Пошук…</string>
     <string name="home_button_search">Пошук</string>
     <string name="search_query_hint">Результати пошуку</string>
-    <string name="search_filters_section_search_providers">Пошукові системи</string>
-    <string name="search_filters_section_additional_options">Додаткові параметри</string>
+    <string name="search_providers_filter_bottom_sheet_title">Пошукові системи</string>
     <string name="search_filters_dead_torrents">Неактивні торенти</string>
     <string name="search_internet_connection_error">Нема з\\\'єднання з інтернетом</string>
     <string name="search_button_try_again">Повторити спробу</string>
@@ -99,7 +98,6 @@
     <string name="category_porn">Порно</string>
     <string name="category_series">Серіали</string>
     <string name="category_other">Інше</string>
-    <string name="search_action_filter">Фільтр</string>
     <plurals name="bookmarks_count_format">
         <item quantity="one">%1$d вподобане</item>
         <item quantity="few">%1$d вподобані</item>

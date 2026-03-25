@@ -40,9 +40,7 @@
     <string name="home_search_query_hint">Поиск…</string>
     <string name="home_button_search">Поиск</string>
     <string name="search_query_hint">Результаты поиска</string>
-    <string name="search_action_filter">Фильтр</string>
-    <string name="search_filters_section_search_providers">Поисковые системы</string>
-    <string name="search_filters_section_additional_options">Дополнительные параметры</string>
+    <string name="search_providers_filter_bottom_sheet_title">Поисковые системы</string>
     <string name="search_filters_dead_torrents">Неактивные торренты</string>
     <string name="search_internet_connection_error">Нет интернет соединения</string>
     <string name="search_button_try_again">Повторить попытку</string>

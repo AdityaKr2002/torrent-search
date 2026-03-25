@@ -1,15 +1,11 @@
 package com.prajwalch.torrentsearch.ui.search.component
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -33,7 +29,6 @@ fun SearchResults(
     onResultClick: (Torrent) -> Unit,
     searchQuery: String,
     searchCategory: Category,
-    isSearching: Boolean,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
@@ -44,43 +39,34 @@ fun SearchResults(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
     ) {
-        Column {
-            AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
-                visible = isSearching,
-            ) {
-                LinearProgressIndicator()
+        LazyColumnWithScrollbar(state = lazyListState) {
+            item {
+                SearchResultsCount(
+                    modifier = Modifier.padding(
+                        horizontal = MaterialTheme.spaces.large,
+                        vertical = MaterialTheme.spaces.small,
+                    ),
+                    searchResultsSize = searchResults.size,
+                    searchQuery = searchQuery,
+                    searchCategory = searchCategory,
+                )
             }
 
-            LazyColumnWithScrollbar(state = lazyListState) {
-                item {
-                    SearchResultsCount(
-                        modifier = Modifier.padding(
-                            horizontal = MaterialTheme.spaces.large,
-                            vertical = MaterialTheme.spaces.small,
-                        ),
-                        searchResultsSize = searchResults.size,
-                        searchQuery = searchQuery,
-                        searchCategory = searchCategory,
-                    )
-                }
-
-                items(items = searchResults, contentType = { it.category }) {
-                    TorrentListItem(
-                        modifier = Modifier
-                            .animateItem()
-                            .clickable { onResultClick(it) },
-                        name = it.name,
-                        size = it.size,
-                        seeders = it.seeders,
-                        peers = it.peers,
-                        uploadDate = it.uploadDate,
-                        category = it.category,
-                        providerName = it.providerName,
-                        isNSFW = it.isNSFW(),
-                    )
-                    HorizontalDivider()
-                }
+            items(items = searchResults, contentType = { it.category }) {
+                TorrentListItem(
+                    modifier = Modifier
+                        .animateItem()
+                        .clickable { onResultClick(it) },
+                    name = it.name,
+                    size = it.size,
+                    seeders = it.seeders,
+                    peers = it.peers,
+                    uploadDate = it.uploadDate,
+                    category = it.category,
+                    providerName = it.providerName,
+                    isNSFW = it.isNSFW(),
+                )
+                HorizontalDivider()
             }
         }
     }

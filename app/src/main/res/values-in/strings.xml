@@ -55,11 +55,9 @@
     <string name="home_search_query_hint">Cari…</string>
     <string name="home_button_search">Cari</string>
     <string name="search_query_hint">Hasil pencarian</string>
-    <string name="search_action_filter">Filter</string>
     <string name="search_action_view_errors">Lihat kesalahan</string>
     <string name="search_action_settings">Pengaturan</string>
-    <string name="search_filters_section_search_providers">Penyedia pencarian</string>
-    <string name="search_filters_section_additional_options">Opsi tambahan</string>
+    <string name="search_providers_filter_bottom_sheet_title">Penyedia pencarian</string>
     <string name="search_filters_dead_torrents">Torrent tidak aktif</string>
     <string name="search_internet_connection_error">Tidak ada koneksi internet</string>
     <string name="search_button_try_again">Coba lagi</string>

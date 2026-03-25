@@ -1,14 +1,18 @@
 package com.prajwalch.torrentsearch.ui.search
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -50,11 +54,11 @@ import com.prajwalch.torrentsearch.ui.component.SortIconButton
 import com.prajwalch.torrentsearch.ui.component.TorrentActionsBottomSheet
 import com.prajwalch.torrentsearch.ui.component.rememberCollapsibleSearchBarState
 import com.prajwalch.torrentsearch.ui.rememberTorrentListState
-import com.prajwalch.torrentsearch.ui.search.component.FilterOptionsBottomSheet
 import com.prajwalch.torrentsearch.ui.search.component.NoInternetConnection
 import com.prajwalch.torrentsearch.ui.search.component.ResultsNotFound
 import com.prajwalch.torrentsearch.ui.search.component.SearchFailuresBottomSheet
 import com.prajwalch.torrentsearch.ui.search.component.SearchResults
+import com.prajwalch.torrentsearch.ui.search.component.SearchResultsFilter
 
 import kotlinx.coroutines.launch
 
@@ -148,17 +152,6 @@ fun SearchScreen(
         )
     }
 
-    var showFilterOptions by rememberSaveable { mutableStateOf(false) }
-    if (showFilterOptions) {
-        FilterOptionsBottomSheet(
-            onDismiss = { showFilterOptions = false },
-            filterOptions = uiState.filterOptions,
-            onToggleSearchProvider = viewModel::toggleSearchProviderResults,
-            onToggleDeadTorrents = viewModel::toggleDeadTorrents,
-            isSearching = uiState.isSearching,
-        )
-    }
-
     TorrentFileDownloadEffect(
         onWrite = viewModel::writeTorrentFile,
         state = torrentFileDownloadState,
@@ -178,7 +171,6 @@ fun SearchScreen(
                 onFilterQueryChange = viewModel::filterSearchResults,
                 onChangeSortCriteria = viewModel::updateSortCriteria,
                 onChangeSortOrder = viewModel::updateSortOrder,
-                onShowFilterOptions = { showFilterOptions = true },
                 onShowSearchFailures = { showSearchFailures = true },
                 onNavigateToSettings = onNavigateToSettings,
                 scrollBehavior = scrollBehavior,
@@ -222,6 +214,8 @@ fun SearchScreen(
                 )
             }
 
+            /*
+            FIXME: If we handle this, the filters (chips) will not be visible.
             uiState.resultsFilteredOut -> {
                 ResultsNotFound(
                     modifier = Modifier
@@ -229,19 +223,38 @@ fun SearchScreen(
                         .padding(innerPadding),
                 )
             }
+            */
 
             else -> {
-                SearchResults(
-                    modifier = Modifier.padding(innerPadding),
-                    searchResults = uiState.searchResults.successes,
-                    onResultClick = { selectedResult = it },
-                    searchQuery = uiState.searchQuery,
-                    searchCategory = uiState.searchCategory,
-                    isSearching = uiState.isSearching,
-                    isRefreshing = uiState.isRefreshing,
-                    onRefresh = viewModel::refreshSearchResults,
-                    lazyListState = torrentListState.lazyListState,
-                )
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                ) {
+                    AnimatedVisibility(
+                        modifier = Modifier.fillMaxWidth(),
+                        visible = uiState.isSearching,
+                    ) {
+                        LinearProgressIndicator()
+                    }
+
+                    SearchResultsFilter(
+                        filterOptions = uiState.filterOptions,
+                        onToggleDeadTorrents = viewModel::toggleDeadTorrents,
+                        onToggleSearchProvider = viewModel::toggleSearchProviderResults,
+                        enableSearchProvidersFilter = !uiState.isSearching &&
+                                uiState.filterOptions.searchProviders.isNotEmpty(),
+                    )
+                    SearchResults(
+                        searchResults = uiState.searchResults.successes,
+                        onResultClick = { selectedResult = it },
+                        searchQuery = uiState.searchQuery,
+                        searchCategory = uiState.searchCategory,
+                        isRefreshing = uiState.isRefreshing,
+                        onRefresh = viewModel::refreshSearchResults,
+                        lazyListState = torrentListState.lazyListState,
+                    )
+                }
             }
         }
     }
@@ -255,7 +268,6 @@ private fun SearchScreenTopBar(
     onFilterQueryChange: (String) -> Unit,
     onChangeSortCriteria: (SortCriteria) -> Unit,
     onChangeSortOrder: (SortOrder) -> Unit,
-    onShowFilterOptions: () -> Unit,
     onShowSearchFailures: () -> Unit,
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
@@ -288,15 +300,6 @@ private fun SearchScreenTopBar(
                 currentOrder = uiState.sortOptions.order,
                 onChangeOrder = onChangeSortOrder,
             )
-            IconButton(
-                onClick = onShowFilterOptions,
-                enabled = enableSearchResultsActions,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_filter_alt),
-                    contentDescription = stringResource(R.string.search_action_filter),
-                )
-            }
         }
 
         // More menu.

@@ -29,7 +29,6 @@
     <string name="torrent_list_action_copy_magnet_link">Magnet bağlantısını kopyala</string>
     <string name="torrent_list_action_share_magnet_link">Magnet bağlantısını paylaş</string>
     <string name="torrent_list_action_open_description_page">Açıklama sayfasını aç</string>
-    <string name="search_filters_section_additional_options">Ek seçenekler</string>
     <string name="search_filters_dead_torrents">Ölü torrentler</string>
     <string name="search_internet_connection_error">İnternet bağlantısı yok</string>
     <string name="search_button_try_again">Tekrar dene</string>
@@ -62,8 +61,7 @@
     <string name="home_search_query_hint">Ara…</string>
     <string name="home_button_search">Ara</string>
     <string name="search_query_hint">Arama sonuçları</string>
-    <string name="search_action_filter">Filtrele</string>
-    <string name="search_filters_section_search_providers">Arama sağlayıcıları</string>
+    <string name="search_providers_filter_bottom_sheet_title">Arama sağlayıcıları</string>
     <string name="search_history_screen_title">Arama geçmişi</string>
     <string name="search_history_dialog_title_clear_history">Arama geçmişini temizle?</string>
     <string name="search_history_dialog_message_clear_history">Arama geçmişi kalıcı olarak silinecek</string>
