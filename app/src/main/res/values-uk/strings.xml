@@ -32,7 +32,7 @@
     <string name="home_button_search">Пошук</string>
     <string name="search_query_hint">Результати пошуку</string>
     <string name="search_filter_providers_title">Пошукові системи</string>
-    <string name="search_filters_dead_torrents">Неактивні торенти</string>
+    <string name="search_filter_chip_dead_torrents">Неактивні торенти</string>
     <string name="search_internet_connection_error">Нема з\\\'єднання з інтернетом</string>
     <string name="search_button_try_again">Повторити спробу</string>
     <string name="search_no_results_message">Результатів не знайдено</string>

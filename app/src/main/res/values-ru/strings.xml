@@ -41,7 +41,7 @@
     <string name="home_button_search">Поиск</string>
     <string name="search_query_hint">Результаты поиска</string>
     <string name="search_filter_providers_title">Поисковые системы</string>
-    <string name="search_filters_dead_torrents">Неактивные торренты</string>
+    <string name="search_filter_chip_dead_torrents">Неактивные торренты</string>
     <string name="search_internet_connection_error">Нет интернет соединения</string>
     <string name="search_button_try_again">Повторить попытку</string>
     <string name="search_no_results_message">Результатов не найдено</string>

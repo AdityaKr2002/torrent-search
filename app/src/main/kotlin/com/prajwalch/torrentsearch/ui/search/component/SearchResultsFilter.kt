@@ -79,14 +79,14 @@ fun SearchResultsFilter(
             FilterChip(
                 selected = filterOptions.deadTorrents,
                 onClick = onToggleDeadTorrents,
-                label = { Text(text = stringResource(R.string.search_filters_dead_torrents)) },
+                label = { Text(text = stringResource(R.string.search_filter_chip_dead_torrents)) },
                 enabled = enableDeadTorrentsFilter,
             )
         }
 
         item(key = "search_providers") {
             val selected = numSelectedSearchProviders > 0
-            val label = stringResource(R.string.search_filters_search_providers).let {
+            val label = stringResource(R.string.search_filter_chip_search_providers).let {
                 if (selected) "$it ($numSelectedSearchProviders)" else it
             }
 
