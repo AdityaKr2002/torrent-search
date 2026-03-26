@@ -75,6 +75,7 @@ class TorznabConfigViewModel @Inject constructor(
             url = config.url,
             apiKey = config.apiKey,
             category = config.category,
+            isNewConfig = false,
         )
     }
 
