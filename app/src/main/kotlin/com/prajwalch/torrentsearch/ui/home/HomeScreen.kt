@@ -79,7 +79,7 @@ fun HomeScreen(
             )
         },
     ) { innerPadding ->
-        // Prevent search bar from being auto focused on older Android versions
+        // Prevent search bar from being autofocused on older Android versions
         // which range from 7.1 to 8.1 (<9).
         val focusableModifier = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             Modifier.focusable()
@@ -92,10 +92,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .verticalScroll(state = rememberScrollState())
                 .padding(innerPadding)
-                .padding(
-                    horizontal = MaterialTheme.spaces.large,
-                    vertical = MaterialTheme.spaces.extraLarge,
-                )
+                .padding(vertical = MaterialTheme.spaces.extraLarge)
                 .then(focusableModifier),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(
@@ -149,10 +146,11 @@ fun HomeScreen(
                 categories = uiState.categories,
                 selectedCategory = uiState.selectedCategory,
                 onCategoryClick = viewModel::setCategory,
+                contentPadding = PaddingValues(horizontal = MaterialTheme.spaces.large),
             )
 
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(fraction = 0.5f),
                 onClick = {
                     onSearch(textFieldState.text.toString(), uiState.selectedCategory)
                 },
