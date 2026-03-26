@@ -66,7 +66,7 @@
     <string name="torrent_list_peers_format">%1$s Pares</string>
     <string name="home_button_search">Busca</string>
     <string name="search_query_hint">Resultados da pesquisa</string>
-    <string name="search_providers_filter_bottom_sheet_title">Provedores de busca</string>
+    <string name="search_filter_providers_title">Provedores de busca</string>
     <string name="search_filters_dead_torrents">Torrents mortos</string>
     <string name="search_results_count_format">%1$s resultados para \\\'%2$s\\\'(%3$s)</string>
     <string name="bookmarks_search_query_hint">Buscar marcadores</string>

@@ -61,7 +61,7 @@
     <string name="home_search_query_hint">Ara…</string>
     <string name="home_button_search">Ara</string>
     <string name="search_query_hint">Arama sonuçları</string>
-    <string name="search_providers_filter_bottom_sheet_title">Arama sağlayıcıları</string>
+    <string name="search_filter_providers_title">Arama sağlayıcıları</string>
     <string name="search_history_screen_title">Arama geçmişi</string>
     <string name="search_history_dialog_title_clear_history">Arama geçmişini temizle?</string>
     <string name="search_history_dialog_message_clear_history">Arama geçmişi kalıcı olarak silinecek</string>
