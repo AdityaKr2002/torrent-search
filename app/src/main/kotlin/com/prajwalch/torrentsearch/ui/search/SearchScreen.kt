@@ -243,6 +243,9 @@ fun SearchScreen(
                         filterOptions = uiState.filterOptions,
                         onToggleDeadTorrents = viewModel::toggleDeadTorrents,
                         onToggleSearchProvider = viewModel::toggleSearchProviderResults,
+                        onSelectAllSearchProviders = viewModel::selectAllSearchProviders,
+                        onDeselectAllSearchProviders = viewModel::deselectAllSearchProviders,
+                        onInvertSearchProvidersSelection = viewModel::invertSearchProvidersSelection,
                         onUpdateCategory = viewModel::updateCategoryFilter,
                         enableSearchProvidersFilter = !uiState.isSearching &&
                                 uiState.filterOptions.searchProviders.isNotEmpty(),

@@ -84,6 +84,9 @@
     <string name="search_filters_dead_torrents">Dead torrents</string>
     <string name="search_filters_search_providers">Search providers</string>
     <string name="search_providers_filter_bottom_sheet_title">Filter by search provider</string>
+    <string name="search_providers_filter_action_select_all">Select all</string>
+    <string name="search_providers_filter_action_deselect_all">Deselect all</string>
+    <string name="search_providers_filter_action_invert_selection">Invert selection</string>
     <string name="search_internet_connection_error">No internet connection</string>
     <string name="search_button_try_again">Try again</string>
     <string name="search_no_results_message">No results found</string>

@@ -236,6 +236,31 @@ class SearchViewModel @Inject constructor(
         resultsProcessor.toggleSearchProviderResults(providerName)
     }
 
+    fun selectAllSearchProviders() {
+        resultsProcessor.updateExcludedSearchProviders(emptySet())
+    }
+
+    fun deselectAllSearchProviders() {
+        uiState
+            .value
+            .filterOptions
+            .searchProviders
+            .map { it.searchProviderName }
+            .toSet()
+            .let(resultsProcessor::updateExcludedSearchProviders)
+    }
+
+    fun invertSearchProvidersSelection() {
+        uiState
+            .value
+            .filterOptions
+            .searchProviders
+            .filter { it.selected }
+            .map { it.searchProviderName }
+            .toSet()
+            .let(resultsProcessor::updateExcludedSearchProviders)
+    }
+
     fun toggleDeadTorrents() {
         resultsProcessor.toggleDeadTorrents()
     }
@@ -520,6 +545,13 @@ private class SearchResultsProcessor(
             }
             it.copy(excludedProviders = newExclusions)
         }
+    }
+
+    /**
+     * Updates the current search providers exclusion list with the given one.
+     */
+    fun updateExcludedSearchProviders(providers: Set<String>) {
+        filters.update { it.copy(excludedProviders = providers) }
     }
 
     /**
