@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -126,6 +127,13 @@ fun HomeScreen(
                 },
                 placeholder = { Text(stringResource(R.string.home_search_query_hint)) },
             ) {
+                CategoryChipsRow(
+                    categories = uiState.categories,
+                    selectedCategory = uiState.selectedCategory,
+                    onCategoryClick = viewModel::setCategory,
+                    contentPadding = PaddingValues(horizontal = MaterialTheme.spaces.large),
+                )
+
                 SearchHistoryList(
                     histories = uiState.histories,
                     onSearchRequest = {
