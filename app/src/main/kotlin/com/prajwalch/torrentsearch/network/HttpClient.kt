@@ -126,13 +126,7 @@ object HttpClient {
     suspend fun getJson(url: String): JsonElement? {
         Log.d(TAG, "getJson")
 
-        val response = getResponse(url)
-        if (response.contentType() != ContentType.Application.Json) {
-            Log.d(TAG, "Received non-Json content")
-            return null
-        }
-
-        val content = response.bodyAsText()
+        val content = getResponse(url).bodyAsText()
         if (content.isEmpty()) {
             Log.d(TAG, "Received empty body")
             return null
