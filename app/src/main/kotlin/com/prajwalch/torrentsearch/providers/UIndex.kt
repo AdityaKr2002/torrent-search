@@ -53,44 +53,44 @@ class UIndex : SearchProvider {
     private fun parseHtml(html: String): List<Torrent>? {
         return Jsoup
             .parse(html)
-            .selectFirst("table.maintable > tbody")
+            .selectFirst("table.sr-table > tbody")
             ?.children()
             ?.mapNotNull { parseTableRow(tr = it) }
     }
 
     private fun parseTableRow(tr: Element): Torrent? {
         val categoryString = tr
-            .selectFirst("td:nth-child(1)")
+            .selectFirst("td.sr-col-cat")
             ?.selectFirst("a")
             ?.ownText()
             ?: return null
         val category = getCategoryFromString(string = categoryString)
 
-        // It contains magnet link, torrent name and upload date.
-        val secondTd = tr.selectFirst("td:nth-child(2)") ?: return null
-        val magnetUri = secondTd.selectFirst("a:nth-child(1)")?.attr("href") ?: return null
+        // It contains magnet link and torrent name.
+        val secondTd = tr.selectFirst("td.sr-col-name") ?: return null
+        val magnetUri = secondTd.selectFirst("a.sr-magnet")?.attr("href") ?: return null
         // Anchor which contains a name and description page URL.
-        val nameHref = secondTd.selectFirst("a:nth-child(2)") ?: return null
-        val name = nameHref.ownText()
+        val nameHref = secondTd.selectFirst("a.sr-torrent-link") ?: return null
+        val torrentName = nameHref.ownText()
         val descriptionPageUrl = info.url + nameHref.attr("href")
-        val uploadDate = secondTd.selectFirst("div")?.ownText() ?: return null
 
-        val size = tr.selectFirst("td:nth-child(3)")?.ownText() ?: return null
+        val size = tr.selectFirst("td.sr-col-size")?.ownText() ?: return null
+        val uploadDate = tr.selectFirst("td.sr-col-uploaded")?.ownText() ?: return null
         val seeders = tr
-            .selectFirst("td:nth-child(4)")
+            .selectFirst("td.sr-col-seeders")
             ?.selectFirst("span")
             ?.ownText()
             ?.filter { it != ',' }
             ?: return null
         val peers = tr
-            .selectFirst("td:nth-child(5)")
+            .selectFirst("td.sr-col-leechers")
             ?.selectFirst("span")
             ?.ownText()
             ?.filter { it != ',' }
             ?: return null
 
         return Torrent(
-            name = name,
+            name = torrentName,
             size = size,
             seeders = seeders.toUIntOrNull() ?: 0u,
             peers = peers.toUIntOrNull() ?: 0u,
