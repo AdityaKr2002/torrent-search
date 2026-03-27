@@ -68,7 +68,7 @@ providers.
 
 The Nightly versions are also available under the artifact section
 of [workflow](https://github.com/prajwalch/TorrentSearch/actions) run (You may require
-to logging in to Github). These are created for
+to logging in to GitHub). These are created for
 each commit/push done to the repository and can be used by anyone to test new features. Please note
 that Nightly builds can contain bugs and may not work properly.
 
