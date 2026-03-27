@@ -286,6 +286,7 @@ private fun SearchScreenTopBar(
 
     val topBarActions: @Composable RowScope.() -> Unit = @Composable {
         val enableSearchResultsActions = when {
+            uiState.isInternetError -> false
             uiState.resultsNotFound -> false
             uiState.resultsFilteredOut -> true
             else -> uiState.searchResults.successes.isNotEmpty()
