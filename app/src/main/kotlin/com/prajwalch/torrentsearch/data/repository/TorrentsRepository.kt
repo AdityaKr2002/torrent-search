@@ -33,38 +33,18 @@ class TorrentsRepository @Inject constructor(
         query = query,
         category = category,
         searchProviders = searchProviders,
-    ).scan(SearchResults()) { searchResults, batchResult ->
-        processBatchResult(
-            currentSearchResults = searchResults,
-            batchResult = batchResult,
-            category = category,
-        )
-    }.flowOn(Dispatchers.IO)
+    ).scan(
+        initial = SearchResults(),
+        operation = ::appendBatchResult,
+    ).flowOn(Dispatchers.IO)
 
-    private fun processBatchResult(
+    private fun appendBatchResult(
         currentSearchResults: SearchResults,
         batchResult: Result<List<Torrent>>,
-        category: Category,
     ): SearchResults = batchResult.fold(
-        onSuccess = {
-            val newSuccesses = filterTorrentsByCategory(torrents = it, category = category)
-            currentSearchResults.appendSuccesses(newSuccesses)
-        },
-        onFailure = {
-            currentSearchResults.appendFailure(it as SearchException)
-        },
+        onSuccess = { currentSearchResults.appendSuccesses(it) },
+        onFailure = { currentSearchResults.appendFailure(it as SearchException) },
     )
-
-    private fun filterTorrentsByCategory(
-        torrents: List<Torrent>,
-        category: Category,
-    ): List<Torrent> {
-        return if (category == Category.All) {
-            torrents
-        } else {
-            torrents.filter { it.category == category }
-        }
-    }
 
     suspend fun downloadTorrentFile(url: String): TorrentFileId {
         val id = UUID.nameUUIDFromBytes(url.toByteArray())
