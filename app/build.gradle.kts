@@ -20,8 +20,8 @@ android {
         applicationId = "com.prajwalch.torrentsearch"
         minSdk = 25
         targetSdk = 36
-        versionCode = 15
-        versionName = "0.4.8"
+        versionCode = 16
+        versionName = "0.4.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -63,7 +63,6 @@ android {
     androidResources {
         generateLocaleConfig = true
     }
-
 }
 
 room {
