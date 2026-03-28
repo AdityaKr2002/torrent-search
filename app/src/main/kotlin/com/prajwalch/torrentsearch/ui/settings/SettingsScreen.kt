@@ -178,6 +178,12 @@ private fun AppearanceSettings(
                 icon = R.drawable.ic_dark_mode,
                 headline = R.string.settings_dark_theme,
                 supportingContent = darkThemeStringResource(uiState.darkTheme),
+                trailingContent = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_keyboard_arrow_down),
+                        contentDescription = null,
+                    )
+                },
             )
             DarkThemeOptionsMenu(
                 expanded = showDarkThemeOptions,
@@ -406,6 +412,12 @@ private fun AdvancedSettings(
             icon = R.drawable.ic_file_export,
             headline = R.string.settings_export_logs_to_file,
             supportingContent = stringResource(R.string.settings_export_logs_to_file_summary),
+            trailingContent = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_forward),
+                    contentDescription = null,
+                )
+            },
         )
     }
 }

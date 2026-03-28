@@ -26,7 +26,7 @@ fun DarkThemeOptionsMenu(
         modifier = modifier,
         expanded = expanded,
         onDismissRequest = onDismiss,
-        offset = DpOffset(x = 16.dp, y = 0.dp),
+        offset = DpOffset(x = 56.dp, y = 0.dp),
     ) {
         DarkTheme.entries.forEach {
             DropdownMenuItem(
