@@ -18,6 +18,9 @@ interface TorznabConfigDao {
     @Query("SELECT * from torznab_configs")
     fun getAllConfigs(): Flow<List<TorznabConfigEntity>>
 
+    @Query("SELECT id FROM torznab_configs")
+    suspend fun getConfigsId(): List<String>
+
     @Query("SELECT COUNT(id) from torznab_configs")
     fun getConfigsCount(): Flow<Int>
 

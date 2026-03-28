@@ -17,8 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -87,62 +85,43 @@ class SearchProvidersViewModel @Inject constructor(
     /** Enables/disables search provider matching the specified ID. */
     fun enableSearchProvider(providerId: SearchProviderId, enable: Boolean) {
         viewModelScope.launch {
-            val enabledSearchProvidersId = settingsRepository
-                .enabledSearchProvidersId
-                .firstOrNull()
-                .orEmpty()
-
-            val newEnabledSearchProvidersId = if (enable) {
-                enabledSearchProvidersId + providerId
+            if (enable) {
+                settingsRepository.addEnabledSearchProviderId(providerId)
             } else {
-                enabledSearchProvidersId - providerId
+                settingsRepository.removeEnabledSearchProviderId(providerId)
             }
-
-            settingsRepository.setEnabledSearchProvidersId(
-                providersId = newEnabledSearchProvidersId,
-            )
         }
     }
 
     /** Enables all search providers. */
     fun enableAllSearchProviders() {
         viewModelScope.launch {
-            val allSearchProvidersId = searchProvidersRepository
-                .getSearchProvidersInfo()
-                .map { infos -> infos.map { it.id } }
-                .firstOrNull()
-                ?: return@launch
-
-            settingsRepository.setEnabledSearchProvidersId(
-                providersId = allSearchProvidersId.toSet(),
-            )
+            val providersIds = searchProvidersRepository.getAllSearchProvidersId()
+            settingsRepository.setEnabledSearchProvidersId(providersIds)
         }
     }
 
     /** Disables all search providers. */
     fun disableAllSearchProviders() {
         viewModelScope.launch {
-            settingsRepository.setEnabledSearchProvidersId(
-                providersId = emptySet(),
-            )
+            settingsRepository.setEnabledSearchProvidersId(emptySet())
         }
     }
 
     /** Resets enabled search providers to default. */
     fun resetEnabledSearchProvidersToDefault() {
         viewModelScope.launch {
-            settingsRepository.setEnabledSearchProvidersId(
-                providersId = searchProvidersRepository.getDefaultSearchProvidersId(),
-            )
+            val defaultProvidersId = searchProvidersRepository.getDefaultSearchProvidersId()
+            settingsRepository.setEnabledSearchProvidersId(defaultProvidersId)
         }
     }
 
     /** Deletes the Torznab search provider that matches the specified ID. */
     fun deleteTorznabConfig(id: String) {
         viewModelScope.launch {
-            searchProvidersRepository.deleteTorznabConfig(id = id)
+            searchProvidersRepository.deleteTorznabConfig(id)
+            settingsRepository.removeEnabledSearchProviderId(id)
         }
-        enableSearchProvider(providerId = id, enable = false)
     }
 
     /** Selects/unselects the given category. */

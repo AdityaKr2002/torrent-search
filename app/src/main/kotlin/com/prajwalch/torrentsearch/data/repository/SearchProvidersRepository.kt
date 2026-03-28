@@ -104,6 +104,13 @@ class SearchProvidersRepository @Inject constructor(
         return builtins.filter { it.info.enabledByDefault }.map { it.info.id }.toSet()
     }
 
+    suspend fun getAllSearchProvidersId(): Set<SearchProviderId> {
+        val builtinProvidersId = builtins.map { it.info.id }
+        val torznabProvidersId = torznabConfigDao.getConfigsId()
+
+        return (builtinProvidersId union torznabProvidersId)
+    }
+
     fun getSearchProvidersInfo(): Flow<List<SearchProviderInfo>> {
         val builtinProvidersInfo = builtins.map { it.info }
 

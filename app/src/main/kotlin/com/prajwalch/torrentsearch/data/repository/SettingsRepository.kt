@@ -122,6 +122,20 @@ class SettingsRepository @Inject constructor(
         dataStore.setOrUpdate(key = ENABLED_SEARCH_PROVIDERS_ID, value = providersId)
     }
 
+    suspend fun addEnabledSearchProviderId(id: SearchProviderId) {
+        dataStore.edit {
+            val currentIds = it[ENABLED_SEARCH_PROVIDERS_ID].orEmpty()
+            it[ENABLED_SEARCH_PROVIDERS_ID] = currentIds + id
+        }
+    }
+
+    suspend fun removeEnabledSearchProviderId(id: SearchProviderId) {
+        dataStore.edit {
+            val currentIds = it[ENABLED_SEARCH_PROVIDERS_ID].orEmpty()
+            it[ENABLED_SEARCH_PROVIDERS_ID] = currentIds - id
+        }
+    }
+
     suspend fun setDefaultCategory(category: Category) {
         dataStore.setOrUpdate(key = DEFAULT_CATEGORY, value = category.name)
     }
