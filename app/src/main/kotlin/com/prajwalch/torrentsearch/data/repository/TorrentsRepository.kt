@@ -9,6 +9,8 @@ import com.prajwalch.torrentsearch.providers.SearchProvider
 
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.withContext
@@ -29,14 +31,17 @@ class TorrentsRepository @Inject constructor(
         query: String,
         category: Category,
         searchProviders: List<SearchProvider>,
-    ) = remoteDataSource.searchTorrents(
-        query = query,
-        category = category,
-        searchProviders = searchProviders,
-    ).scan(
-        initial = SearchResults(),
-        operation = ::appendBatchResult,
-    ).flowOn(Dispatchers.IO)
+    ): Flow<SearchResults> =
+        remoteDataSource.searchTorrents(
+            query = query,
+            category = category,
+            searchProviders = searchProviders,
+        ).scan(
+            initial = SearchResults(),
+            operation = ::appendBatchResult,
+        ).filter {
+            it.successes.isNotEmpty()
+        }.flowOn(Dispatchers.IO)
 
     private fun appendBatchResult(
         currentSearchResults: SearchResults,
