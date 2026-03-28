@@ -10,7 +10,7 @@ import com.prajwalch.torrentsearch.providers.SearchProvider
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.withContext
@@ -39,9 +39,7 @@ class TorrentsRepository @Inject constructor(
         ).scan(
             initial = SearchResults(),
             operation = ::appendBatchResult,
-        ).filter {
-            it.successes.isNotEmpty()
-        }.flowOn(Dispatchers.IO)
+        ).drop(1).flowOn(Dispatchers.IO)
 
     private fun appendBatchResult(
         currentSearchResults: SearchResults,
