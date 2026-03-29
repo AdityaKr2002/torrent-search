@@ -6,10 +6,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import com.prajwalch.torrentsearch.data.repository.SearchProvidersRepository
+import com.prajwalch.torrentsearch.domain.SearchProvidersManager
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.TorznabConnectionCheckResult
 import com.prajwalch.torrentsearch.providers.SearchProviderId
+import com.prajwalch.torrentsearch.providers.TorznabSearchProvider
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 
@@ -45,7 +46,7 @@ sealed interface TorznabConfigEvent {
 
 @HiltViewModel
 class TorznabConfigViewModel @Inject constructor(
-    private val searchProvidersRepository: SearchProvidersRepository,
+    private val searchProvidersManager: SearchProvidersManager,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     /**
@@ -68,7 +69,7 @@ class TorznabConfigViewModel @Inject constructor(
     }
 
     private fun loadConfig(id: SearchProviderId) = viewModelScope.launch {
-        val config = searchProvidersRepository.findTorznabConfig(id = id) ?: return@launch
+        val config = searchProvidersManager.findTorznabConfigById(id) ?: return@launch
 
         _uiState.value = TorznabConfigUiState(
             searchProviderName = config.searchProviderName,
@@ -111,8 +112,8 @@ class TorznabConfigViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val connectionCheckResult = searchProvidersRepository
-                .checkTorznabConnection(url = _uiState.value.url, apiKey = _uiState.value.apiKey)
+            val connectionCheckResult = TorznabSearchProvider
+                .checkConnection(url = _uiState.value.url, apiKey = _uiState.value.apiKey)
 
             _uiState.update { it.copy(isConnectionCheckRunning = false) }
             _events.send(TorznabConfigEvent.ConnectionCheckCompleted(connectionCheckResult))
@@ -139,7 +140,7 @@ class TorznabConfigViewModel @Inject constructor(
     private fun isUrlValid(): Boolean = Patterns.WEB_URL.matcher(_uiState.value.url).matches()
 
     private suspend fun createConfig() {
-        searchProvidersRepository.createTorznabConfig(
+        searchProvidersManager.createTorznabConfig(
             searchProviderName = _uiState.value.searchProviderName,
             url = _uiState.value.url,
             apiKey = _uiState.value.apiKey,
@@ -148,7 +149,7 @@ class TorznabConfigViewModel @Inject constructor(
     }
 
     private suspend fun updateConfig(id: SearchProviderId) {
-        searchProvidersRepository.updateTorznabConfig(
+        searchProvidersManager.updateTorznabConfig(
             id = id,
             searchProviderName = _uiState.value.searchProviderName,
             url = _uiState.value.url,

@@ -52,12 +52,9 @@ private object TorznabFunctions {
 }
 
 /** A search provider which is based on Torznab specification. */
-class TorznabSearchProvider(
-    id: SearchProviderId,
-    private val config: TorznabConfig,
-) : SearchProvider {
+class TorznabSearchProvider(private val config: TorznabConfig) : SearchProvider {
     override val info = SearchProviderInfo(
-        id = id,
+        id = config.id,
         name = config.searchProviderName,
         url = config.url,
         // TODO: We need to change the way we handle the specialized category.

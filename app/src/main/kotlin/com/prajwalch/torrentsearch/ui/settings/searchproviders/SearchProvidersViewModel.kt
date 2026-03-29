@@ -3,11 +3,10 @@ package com.prajwalch.torrentsearch.ui.settings.searchproviders
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import com.prajwalch.torrentsearch.data.repository.SearchProvidersRepository
-import com.prajwalch.torrentsearch.data.repository.SettingsRepository
+import com.prajwalch.torrentsearch.domain.SearchProviderInfoItem
+import com.prajwalch.torrentsearch.domain.SearchProvidersManager
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.providers.SearchProviderId
-import com.prajwalch.torrentsearch.providers.SearchProviderInfo
 import com.prajwalch.torrentsearch.providers.SearchProviderSafetyStatus
 import com.prajwalch.torrentsearch.providers.SearchProviderType
 
@@ -41,15 +40,13 @@ data class SearchProviderListItem(
 /** ViewModel which handles the business logic of Search providers screen. */
 @HiltViewModel
 class SearchProvidersViewModel @Inject constructor(
-    private val searchProvidersRepository: SearchProvidersRepository,
-    private val settingsRepository: SettingsRepository,
+    private val searchProvidersManager: SearchProvidersManager,
 ) : ViewModel() {
     private val selectedCategory = MutableStateFlow<Category?>(null)
 
     val uiState = combine(
         selectedCategory,
-        searchProvidersRepository.getSearchProvidersInfo(),
-        settingsRepository.enabledSearchProvidersId,
+        searchProvidersManager.getInfos(),
         ::createUiState,
     ).stateIn(
         scope = viewModelScope,
@@ -59,8 +56,7 @@ class SearchProvidersViewModel @Inject constructor(
 
     private fun createUiState(
         selectedCategory: Category?,
-        searchProvidersInfo: List<SearchProviderInfo>,
-        enabledSearchProvidersId: Set<SearchProviderId>,
+        searchProvidersInfo: List<SearchProviderInfoItem>,
     ): SearchProvidersUiState {
         val searchProviders = searchProvidersInfo
             .filter { selectedCategory == null || it.specializedCategory == selectedCategory }
@@ -72,7 +68,7 @@ class SearchProvidersViewModel @Inject constructor(
                     specializedCategory = it.specializedCategory,
                     safetyStatus = it.safetyStatus,
                     type = it.type,
-                    enabled = it.id in enabledSearchProvidersId,
+                    enabled = it.isEnabled,
                 )
             }
 
@@ -86,9 +82,9 @@ class SearchProvidersViewModel @Inject constructor(
     fun enableSearchProvider(providerId: SearchProviderId, enable: Boolean) {
         viewModelScope.launch {
             if (enable) {
-                settingsRepository.addEnabledSearchProviderId(providerId)
+                searchProvidersManager.enable(providerId)
             } else {
-                settingsRepository.removeEnabledSearchProviderId(providerId)
+                searchProvidersManager.disable(providerId)
             }
         }
     }
@@ -96,31 +92,28 @@ class SearchProvidersViewModel @Inject constructor(
     /** Enables all search providers. */
     fun enableAllSearchProviders() {
         viewModelScope.launch {
-            val providersIds = searchProvidersRepository.getAllSearchProvidersId()
-            settingsRepository.setEnabledSearchProvidersId(providersIds)
+            searchProvidersManager.enableAll()
         }
     }
 
     /** Disables all search providers. */
     fun disableAllSearchProviders() {
         viewModelScope.launch {
-            settingsRepository.setEnabledSearchProvidersId(emptySet())
+            searchProvidersManager.disableAll()
         }
     }
 
     /** Resets enabled search providers to default. */
     fun resetEnabledSearchProvidersToDefault() {
         viewModelScope.launch {
-            val defaultProvidersId = searchProvidersRepository.getDefaultSearchProvidersId()
-            settingsRepository.setEnabledSearchProvidersId(defaultProvidersId)
+            searchProvidersManager.resetToDefault()
         }
     }
 
     /** Deletes the Torznab search provider that matches the specified ID. */
     fun deleteTorznabConfig(id: String) {
         viewModelScope.launch {
-            searchProvidersRepository.deleteTorznabConfig(id)
-            settingsRepository.removeEnabledSearchProviderId(id)
+            searchProvidersManager.deleteTorznabConfig(id)
         }
     }
 

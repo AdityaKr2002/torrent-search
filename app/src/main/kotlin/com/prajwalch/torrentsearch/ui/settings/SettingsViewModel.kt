@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.prajwalch.torrentsearch.BuildConfig
-import com.prajwalch.torrentsearch.data.repository.SearchProvidersRepository
 import com.prajwalch.torrentsearch.data.repository.SettingsRepository
+import com.prajwalch.torrentsearch.domain.SearchProvidersManager
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.DarkTheme
 import com.prajwalch.torrentsearch.domain.model.MaxNumResults
@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -75,12 +74,12 @@ data class AdvancedSettingsUiState(
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
-    private val searchProvidersRepository: SearchProvidersRepository,
+    private val searchProvidersManager: SearchProvidersManager,
 ) : ViewModel() {
     val uiState = combine(
         settingsRepository.getAppearanceSettings(),
         settingsRepository.getGeneralSettings(),
-        settingsRepository.getSearchSettings(searchProvidersRepository.getSearchProvidersCount()),
+        settingsRepository.getSearchSettings(searchProvidersManager.getCount()),
         settingsRepository.getSearchHistorySettings(),
         settingsRepository.getAdvancedSettings(),
         ::SettingsUiState,
@@ -115,27 +114,8 @@ class SettingsViewModel @Inject constructor(
     fun enableNSFWMode(enable: Boolean) {
         viewModelScope.launch {
             settingsRepository.enableNSFWMode(enable = enable)
-            if (!enable) disableRestrictedSearchProviders()
+            if (!enable) searchProvidersManager.disableRestricted()
         }
-    }
-
-    /** Disables NSFW and Unsafe search providers which are currently enabled. */
-    private suspend fun disableRestrictedSearchProviders() {
-        val enabledSearchProvidersInfo = combine(
-            searchProvidersRepository.getSearchProvidersInfo(),
-            settingsRepository.enabledSearchProvidersId,
-        ) { searchProvidersInfo, enabledSearchProvidersId ->
-            searchProvidersInfo.filter { it.id in enabledSearchProvidersId }
-        }.firstOrNull() ?: return
-
-        val newEnabledSearchProvidersId = enabledSearchProvidersInfo
-            .filterNot { it.specializedCategory.isNSFW || it.safetyStatus.isUnsafe() }
-            .map { it.id }
-            .toSet()
-
-        settingsRepository.setEnabledSearchProvidersId(
-            providersId = newEnabledSearchProvidersId,
-        )
     }
 
     /** Updates the maximum number of results. */

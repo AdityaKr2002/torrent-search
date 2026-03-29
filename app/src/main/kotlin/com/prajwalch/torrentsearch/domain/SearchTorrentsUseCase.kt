@@ -1,16 +1,13 @@
 package com.prajwalch.torrentsearch.domain
 
-import com.prajwalch.torrentsearch.data.repository.SearchProvidersRepository
 import com.prajwalch.torrentsearch.data.repository.SettingsRepository
 import com.prajwalch.torrentsearch.data.repository.TorrentsRepository
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.MaxNumResults
 import com.prajwalch.torrentsearch.domain.model.SearchResults
-import com.prajwalch.torrentsearch.providers.SearchProvider
 
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.transformWhile
@@ -19,11 +16,11 @@ import javax.inject.Inject
 
 class SearchTorrentsUseCase @Inject constructor(
     private val torrentsRepository: TorrentsRepository,
-    private val searchProvidersRepository: SearchProvidersRepository,
+    private val searchProvidersManager: SearchProvidersManager,
     private val settingsRepository: SettingsRepository,
 ) {
     operator fun invoke(query: String, category: Category): Flow<SearchResults> = flow {
-        val enabledSearchProviders = getEnabledSearchProviders(category = category)
+        val enabledSearchProviders = searchProvidersManager.getEnabledProvidersByCategory(category)
         val limit = getSearchResultsLimit()
 
         torrentsRepository.search(
@@ -60,15 +57,7 @@ class SearchTorrentsUseCase @Inject constructor(
         }.collect { emit(it) }
     }
 
-    private suspend fun getEnabledSearchProviders(category: Category): List<SearchProvider> {
-        val enabledSearchProvidersId = settingsRepository.enabledSearchProvidersId.first()
-
-        return searchProvidersRepository
-            .getSearchProvidersByCategory(category = category)
-            .filter { it.info.id in enabledSearchProvidersId }
-    }
-
     private suspend fun getSearchResultsLimit(): MaxNumResults {
-        return settingsRepository.maxNumResults.firstOrNull() ?: MaxNumResults.Companion.Unlimited
+        return settingsRepository.maxNumResults.firstOrNull() ?: MaxNumResults.Unlimited
     }
 }
