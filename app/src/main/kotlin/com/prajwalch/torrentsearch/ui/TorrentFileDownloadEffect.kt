@@ -35,6 +35,7 @@ fun TorrentFileDownloadEffect(
 
     val fileDownloadingMessage = stringResource(R.string.torrent_file_downloading_message)
     val fileDownloadError = stringResource(R.string.torrent_file_download_error)
+    val fileNotFoundError = stringResource(R.string.torrent_file_not_found_error)
     val fileSavingMessage = stringResource(R.string.torrent_file_saving_message)
     val fileSavedMessage = stringResource(R.string.torrent_file_saved_message)
     val fileSaveError = stringResource(R.string.torrent_file_save_error)
@@ -51,11 +52,15 @@ fun TorrentFileDownloadEffect(
                         ?.let { "$fileDownloadError: $it" }
                         ?: fileDownloadError
 
-                    snackbarHostState.showSnackbar(message = message)
+                    snackbarHostState.showSnackbar(message)
+                }
+
+                TorrentFileDownloadEvent.FileNotFound -> {
+                    snackbarHostState.showSnackbar(fileNotFoundError)
                 }
 
                 TorrentFileDownloadEvent.WriteSucceed -> {
-                    snackbarHostState.showSnackbar(message = fileSavedMessage)
+                    snackbarHostState.showSnackbar(fileSavedMessage)
                 }
 
                 is TorrentFileDownloadEvent.WriteFailed -> {
@@ -63,7 +68,7 @@ fun TorrentFileDownloadEffect(
                         ?.let { "$fileSaveError: $it" }
                         ?: fileSaveError
 
-                    snackbarHostState.showSnackbar(message = message)
+                    snackbarHostState.showSnackbar(message)
                 }
             }
         }

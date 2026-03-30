@@ -49,11 +49,11 @@ class TorrentsRepository @Inject constructor(
         onFailure = { currentSearchResults.appendFailure(it as SearchException) },
     )
 
-    suspend fun downloadTorrentFile(url: String): TorrentFileId {
+    suspend fun downloadTorrentFile(url: String): TorrentFileId? {
         val id = UUID.nameUUIDFromBytes(url.toByteArray())
         if (torrentFileContentCache.containsKey(id)) return id
 
-        val fileContent = remoteDataSource.downloadTorrentFile(url = url)
+        val fileContent = remoteDataSource.downloadTorrentFile(url = url) ?: return null
         torrentFileContentCache[id] = fileContent
 
         return id

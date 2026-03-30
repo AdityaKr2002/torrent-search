@@ -28,6 +28,8 @@ sealed interface TorrentFileDownloadEvent {
 
     data class DownloadFailed(val message: String?) : TorrentFileDownloadEvent
 
+    data object FileNotFound : TorrentFileDownloadEvent
+
     data object WriteSucceed : TorrentFileDownloadEvent
 
     data class WriteFailed(val message: String?) : TorrentFileDownloadEvent
@@ -50,8 +52,13 @@ class TorrentFileDownloader @Inject constructor(
         _state.value = TorrentFileDownloadState.Downloading
 
         try {
-            pendingFileId = torrentsRepository.downloadTorrentFile(url)
-            _events.send(TorrentFileDownloadEvent.ReadyToWrite(fileName))
+            val fileId = torrentsRepository.downloadTorrentFile(url)
+            if (fileId == null) {
+                _events.send(TorrentFileDownloadEvent.FileNotFound)
+            } else {
+                pendingFileId = fileId
+                _events.send(TorrentFileDownloadEvent.ReadyToWrite(fileName))
+            }
         } catch (e: CancellationException) {
             // Never catch this.
             throw e

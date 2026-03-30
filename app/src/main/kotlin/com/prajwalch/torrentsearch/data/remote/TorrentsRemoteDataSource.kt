@@ -11,6 +11,7 @@ import com.prajwalch.torrentsearch.providers.SearchContext
 import com.prajwalch.torrentsearch.providers.SearchProvider
 
 import io.ktor.client.statement.bodyAsChannel
+import io.ktor.http.isSuccess
 import io.ktor.utils.io.readRemaining
 
 import kotlinx.coroutines.CancellationException
@@ -28,9 +29,9 @@ class TorrentsRemoteDataSource @Inject constructor(
 ) {
     suspend fun downloadTorrentFile(url: String) = withContext(Dispatchers.IO) {
         val response = httpClient.getResponse(url = url)
-        val bodyChannel = response.bodyAsChannel()
+        if (!response.status.isSuccess()) return@withContext null
 
-        bodyChannel.readRemaining().readByteArray()
+        response.bodyAsChannel().readRemaining().readByteArray()
     }
 
     fun searchTorrents(
