@@ -38,7 +38,7 @@ class SearchProvidersManager @Inject constructor(
     private val settingsRepository: SettingsRepository,
 ) {
     /**
-     * Returns instances of enabled provider.
+     * Returns instances of enabled providers.
      */
     suspend fun getEnabledProviders(): List<SearchProvider> {
         val enabledProviderIds = settingsRepository.enabledSearchProvidersId.firstOrNull()
@@ -51,7 +51,7 @@ class SearchProvidersManager @Inject constructor(
     }
 
     /**
-     * Returns instances of enabled provider, filtering them by their
+     * Returns instances of enabled providers, filtering them by their
      * specialized category.
      */
     suspend fun getEnabledProvidersByCategory(category: Category): List<SearchProvider> {
@@ -62,7 +62,7 @@ class SearchProvidersManager @Inject constructor(
     }
 
     /**
-     * Returns instances of enabled Torznab provider.
+     * Returns instances of enabled Torznab providers.
      */
     private suspend fun getEnabledTorznabProviders(
         enabledProviderIds: Set<SearchProviderId>,
@@ -73,9 +73,9 @@ class SearchProvidersManager @Inject constructor(
         .orEmpty()
 
     /**
-     * Returns search provider infos as [Flow].
+     * Returns [SearchProviderInfo]s of all search providers.
      */
-    fun getInfos(): Flow<List<SearchProviderInfoItem>> =
+    fun getProviderInfos(): Flow<List<SearchProviderInfoItem>> =
         combine(
             torznabConfigRepository.getAllConfigs(),
             settingsRepository.enabledSearchProvidersId,
@@ -93,20 +93,20 @@ class SearchProvidersManager @Inject constructor(
     /**
      * Returns providers count as [Flow].
      */
-    fun getCount(): Flow<Int> = torznabConfigRepository.getConfigsCount()
+    fun getProvidersCount(): Flow<Int> = torznabConfigRepository.getConfigsCount()
         .map { torznabConfigCount -> builtinProviders.size + torznabConfigCount }
 
     /**
-     * Enables provider that is associated with the given ID.
+     * Enables the provider associated with the given ID.
      */
-    suspend fun enable(id: SearchProviderId) {
+    suspend fun enableProvider(id: SearchProviderId) {
         settingsRepository.addEnabledSearchProviderId(id)
     }
 
     /**
      * Enables all providers.
      */
-    suspend fun enableAll() {
+    suspend fun enableAllProviders() {
         val builtinProviderIds = builtinProviders.map { it.info.id }
         val torznabProviderIds = torznabConfigRepository.getAllConfigsId()
         val allIds = builtinProviderIds union torznabProviderIds
@@ -115,23 +115,23 @@ class SearchProvidersManager @Inject constructor(
     }
 
     /**
-     * Disables provider that is associated with the given ID.
+     * Disables the provider associated with the given ID.
      */
-    suspend fun disable(id: SearchProviderId) {
+    suspend fun disableProvider(id: SearchProviderId) {
         settingsRepository.removeEnabledSearchProviderId(id)
     }
 
     /**
      * Disables all providers.
      */
-    suspend fun disableAll() {
+    suspend fun disableAllProviders() {
         settingsRepository.setEnabledSearchProvidersId(emptySet())
     }
 
     /**
      * Disables NSFW and unsafe providers.
      */
-    suspend fun disableRestricted() {
+    suspend fun disableRestrictedProviders() {
         val enabledProviderIds = settingsRepository.enabledSearchProvidersId.firstOrNull()
         if (enabledProviderIds.isNullOrEmpty()) return
 
@@ -155,10 +155,6 @@ class SearchProvidersManager @Inject constructor(
             .let { settingsRepository.setEnabledSearchProvidersId(it) }
     }
 
-    /*
-     * Torznab related operations.
-    */
-
     /**
      * Creates and stores a new Torznab config using the given values.
      */
@@ -177,16 +173,15 @@ class SearchProvidersManager @Inject constructor(
     }
 
     /**
-     * Attempts to find existing Torznab config that is associated with the
-     * give ID.
+     * Attempts to find the existing Torznab config associated with the given ID.
      */
     suspend fun findTorznabConfigById(id: String): TorznabConfig? {
         return torznabConfigRepository.findConfigById(id)
     }
 
     /**
-     * Updates the Torznab config that is associated with the given ID
-     * using the given new values.
+     * Updates the Torznab config associated with the given ID with the
+     * given new values.
      */
     suspend fun updateTorznabConfig(
         id: String,
@@ -205,7 +200,7 @@ class SearchProvidersManager @Inject constructor(
     }
 
     /**
-     * Deletes the existing Torznab config that is associated with the given ID.
+     * Deletes the existing Torznab config associated with the given ID.
      */
     suspend fun deleteTorznabConfig(id: String) {
         torznabConfigRepository.deleteConfigById(id)

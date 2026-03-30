@@ -79,7 +79,7 @@ class SettingsViewModel @Inject constructor(
     val uiState = combine(
         settingsRepository.getAppearanceSettings(),
         settingsRepository.getGeneralSettings(),
-        settingsRepository.getSearchSettings(searchProvidersManager.getCount()),
+        settingsRepository.getSearchSettings(searchProvidersManager.getProvidersCount()),
         settingsRepository.getSearchHistorySettings(),
         settingsRepository.getAdvancedSettings(),
         ::SettingsUiState,
@@ -114,7 +114,7 @@ class SettingsViewModel @Inject constructor(
     fun enableNSFWMode(enable: Boolean) {
         viewModelScope.launch {
             settingsRepository.enableNSFWMode(enable = enable)
-            if (!enable) searchProvidersManager.disableRestricted()
+            if (!enable) searchProvidersManager.disableRestrictedProviders()
         }
     }
 

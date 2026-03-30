@@ -46,7 +46,7 @@ class SearchProvidersViewModel @Inject constructor(
 
     val uiState = combine(
         selectedCategory,
-        searchProvidersManager.getInfos(),
+        searchProvidersManager.getProviderInfos(),
         ::createUiState,
     ).stateIn(
         scope = viewModelScope,
@@ -82,9 +82,9 @@ class SearchProvidersViewModel @Inject constructor(
     fun enableSearchProvider(providerId: SearchProviderId, enable: Boolean) {
         viewModelScope.launch {
             if (enable) {
-                searchProvidersManager.enable(providerId)
+                searchProvidersManager.enableProvider(providerId)
             } else {
-                searchProvidersManager.disable(providerId)
+                searchProvidersManager.disableProvider(providerId)
             }
         }
     }
@@ -92,14 +92,14 @@ class SearchProvidersViewModel @Inject constructor(
     /** Enables all search providers. */
     fun enableAllSearchProviders() {
         viewModelScope.launch {
-            searchProvidersManager.enableAll()
+            searchProvidersManager.enableAllProviders()
         }
     }
 
     /** Disables all search providers. */
     fun disableAllSearchProviders() {
         viewModelScope.launch {
-            searchProvidersManager.disableAll()
+            searchProvidersManager.disableAllProviders()
         }
     }
 
