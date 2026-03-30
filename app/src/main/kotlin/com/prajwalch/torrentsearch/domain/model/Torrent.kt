@@ -1,5 +1,7 @@
 package com.prajwalch.torrentsearch.domain.model
 
+import com.prajwalch.torrentsearch.util.TorrentUtils
+
 /** Represents a magnet URI. */
 typealias MagnetUri = String
 
@@ -44,6 +46,14 @@ data class Torrent(
     fun magnetUri(): MagnetUri = when (infoHashOrMagnetUri) {
         is InfoHashOrMagnetUri.InfoHash -> createMagnetUri(infoHashOrMagnetUri.hash)
         is InfoHashOrMagnetUri.MagnetUri -> infoHashOrMagnetUri.uri
+    }
+
+    /** Returns the info hash of this torrent. */
+    fun infoHash(): String = when (infoHashOrMagnetUri) {
+        is InfoHashOrMagnetUri.InfoHash -> infoHashOrMagnetUri.hash
+        is InfoHashOrMagnetUri.MagnetUri -> {
+            TorrentUtils.getInfoHashFromMagnetUri(infoHashOrMagnetUri.uri)
+        }
     }
 }
 

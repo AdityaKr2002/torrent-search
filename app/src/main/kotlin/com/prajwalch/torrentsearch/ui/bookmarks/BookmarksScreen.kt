@@ -122,10 +122,19 @@ fun BookmarksScreen(
             onDownloadTorrent = {
                 onDownloadTorrent(bookmark.magnetUri())
             },
-            onDownloadTorrentFile = bookmark.fileDownloadLink?.let {
-                {
-                    val torrentFileName = bookmark.name.replace(' ', '-')
-                    viewModel.downloadTorrentFile(url = it, fileName = torrentFileName)
+            onDownloadTorrentFile = {
+                val torrentFileName = bookmark.name.replace(' ', '-')
+
+                if (bookmark.fileDownloadLink != null) {
+                    viewModel.downloadTorrentFile(
+                        url = bookmark.fileDownloadLink,
+                        fileName = torrentFileName,
+                    )
+                } else {
+                    viewModel.downloadTorrentFileFromInfoHash(
+                        infoHash = bookmark.infoHash(),
+                        fileName = torrentFileName,
+                    )
                 }
             },
             onCopyMagnetLink = {

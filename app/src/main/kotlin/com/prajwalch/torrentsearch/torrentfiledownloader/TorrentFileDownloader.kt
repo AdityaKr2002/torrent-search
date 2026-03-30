@@ -62,6 +62,11 @@ class TorrentFileDownloader @Inject constructor(
         }
     }
 
+    suspend fun downloadFileFromInfoHash(infoHash: String, fileName: String) {
+        val url = "https://itorrents.net/torrent/${infoHash.uppercase()}.torrent"
+        downloadFile(url, fileName)
+    }
+
     suspend fun writeFile(outputStream: OutputStream) {
         val pendingFileId = pendingFileId ?: return
         _state.value = TorrentFileDownloadState.Writing

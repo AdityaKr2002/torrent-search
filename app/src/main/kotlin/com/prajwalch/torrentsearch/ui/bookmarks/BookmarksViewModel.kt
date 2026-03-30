@@ -120,6 +120,15 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
+    fun downloadTorrentFileFromInfoHash(infoHash: String, fileName: String) {
+        viewModelScope.launch {
+            torrentFileDownloader.downloadFileFromInfoHash(
+                infoHash = infoHash,
+                fileName = fileName,
+            )
+        }
+    }
+
     fun writeTorrentFile(outputStream: OutputStream) {
         viewModelScope.launch {
             torrentFileDownloader.writeFile(outputStream)
