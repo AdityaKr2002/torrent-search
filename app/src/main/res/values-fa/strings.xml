@@ -23,7 +23,7 @@
     <string name="torrent_client_not_found_recommended_client_hint">برنامه دانلود از تورنت پیشنهادی</string>
     <string name="torrent_list_action_bookmark_torrent">نشانه گذاری تورنت</string>
     <string name="torrent_list_action_delete_bookmark">حذف نشانه گذاری</string>
-    <string name="torrent_list_action_download_torrent">دانلود تورنت</string>
+    <string name="torrent_list_action_download_torrent">دانلود از تورنت</string>
     <string name="torrent_list_action_copy_magnet_link">کپی کردن لینک magnet</string>
     <string name="torrent_list_action_share_magnet_link">اشتراک گذاری لینک magnet</string>
     <string name="torrent_list_action_open_description_page">مشاهده صفحه توضیحات</string>
@@ -116,7 +116,7 @@
     <string name="bookmarked_message">نشانه گذاری شده</string>
     <string name="main_cannot_search_using_url_message">نمی توان با استفاده از لینک جستجو کرد</string>
     <string name="main_cannot_search_blank_query_message">نمی‌ توان با استفاده از یک عبارت جستجوی خالی جستجو کرد</string>
-    <string name="settings_enable_dynamic_theme_summary">تولید پس زمینه برنامه بر اساس پس زمینه دستگاه</string>
+    <string name="settings_enable_dynamic_theme_summary">تولید زمینه برنامه بر اساس تصویر زمینه دستگاه</string>
     <string name="settings_pure_black_summary">‌حالت پس زمینه AMOLED را فعال می کند</string>
     <string name="settings_save_search_history_summary">جستجو های اخیر را به صورت محلی برای دسترسی سریع و پیشنهادات ذخیره می‌ کند</string>
     <string name="torznab_conn_check_result_conn_established">اتصال برقرار شد</string>
@@ -126,7 +126,7 @@
     <string name="torznab_conn_check_result_unexpected_response">پاسخ غیرمنتظره (%1$d)</string>
     <string name="torznab_conn_check_result_unexpected_error">خطای غیرمنتظره</string>
     <string name="crash_screen_title">اوه</string>
-    <string name="crash_screen_subtitle">%1$s با یک خطای غیرمنتظره مواجه شد لطفا گزارش‌ ها را استخراج کنید و یک مشکل در گیت‌ هاب با گزارش‌ های پیوست‌ شده ایجاد کنید</string>
+    <string name="crash_screen_subtitle">%1$s با یک خطا مواجه شد لطفا گزارش‌ ها را استخراج کنید و یک مشکل در گیت هاب با گزارش‌های پیوست شده ایجاد کنید</string>
     <string name="crash_button_export_crash_logs">ذخیره گزارش‌ های خرابی در یک فایل</string>
     <string name="crash_button_restart_application">برنامه را ببندید و سپس دوباره باز کنید</string>
     <string name="crash_logs_export_success_message">گزارش ها در یک فایل ذخیره می شوند</string>
@@ -142,4 +142,14 @@
     <string name="search_providers_button_check_connection">اتصال خود را بر رسی کنید</string>
     <string name="settings_export_logs_to_file">استخراج گزارش ها در فایل</string>
     <string name="settings_export_logs_to_file_summary">یک فایل شامل فعالیت‌ های برنامه ایجاد می‌ کند که می‌ تواند به عیب‌ یابی مشکلات کمک کند</string>
+    <string name="torrent_file_download_error">دانلود نشد</string>
+    <string name="torrent_file_saved_message">فایل تورنت ذخیره شد</string>
+    <string name="torrent_file_save_error">ذخیره فایل تورنت ناموفق بود</string>
+    <string name="torrent_list_action_download_torrent_file">دانلود فایل تورنت</string>
+    <string name="search_filter_chip_search_providers">ارائه دهندگان جستجو</string>
+    <string name="search_filter_providers_action_select_all">انتخاب همه</string>
+    <string name="search_filter_providers_action_deselect_all">لغو انتخاب همه</string>
+    <string name="search_filter_providers_action_invert_selection">انتخاب معکوس</string>
+    <string name="torrent_file_downloading_message">در حال دانلود فایل تورنت …</string>
+    <string name="torrent_file_saving_message">در حال ذخیره فایل تورنت…</string>
 </resources>
