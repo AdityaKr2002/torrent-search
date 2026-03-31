@@ -60,11 +60,14 @@ class TokyoToshokan : SearchProvider {
             .selectFirst("a:nth-child(1)")
             ?.attr("href")
             ?: return null
-        val torrentName = tr1SecondTd
-            .selectFirst("a:nth-child(2)")
-            ?.text()
-            ?.replace(oldValue = " ", newValue = "")
-            ?: return null
+
+        val nameAnchor = tr1SecondTd.selectFirst("a:nth-child(2)") ?: return null
+        val torrentName = nameAnchor.text().replace(oldValue = " ", newValue = "")
+        val fileDownloadLink = if (nameAnchor.attr("type") == "application/x-bittorrent") {
+            nameAnchor.attr("href")
+        } else {
+            null
+        }
 
         val descriptionPageRelativeUrl = tr1
             .selectFirst("td:nth-child(3)")
@@ -106,6 +109,7 @@ class TokyoToshokan : SearchProvider {
             category = info.specializedCategory,
             descriptionPageUrl = descriptionPageUrl,
             infoHashOrMagnetUri = InfoHashOrMagnetUri.MagnetUri(magnetUri),
+            fileDownloadLink = fileDownloadLink,
         )
     }
 }
