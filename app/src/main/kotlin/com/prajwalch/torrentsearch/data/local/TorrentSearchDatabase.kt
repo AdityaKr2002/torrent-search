@@ -2,6 +2,7 @@ package com.prajwalch.torrentsearch.data.local
 
 import android.content.Context
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteColumn
 import androidx.room.RenameTable
@@ -30,6 +31,15 @@ import com.prajwalch.torrentsearch.data.local.entities.ViewedTorrentEntity
     ],
     version = 5,
     exportSchema = true,
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2),
+        AutoMigration(
+            from = 2,
+            to = 3,
+            spec = TorrentSearchDatabase.Migration2To3Spec::class,
+        ),
+        AutoMigration(from = 3, to = 4),
+    ],
 )
 abstract class TorrentSearchDatabase : RoomDatabase() {
     abstract fun bookmarkedTorrentDao(): BookmarkedTorrentDao
