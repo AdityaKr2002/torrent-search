@@ -252,6 +252,7 @@ fun SearchScreen(
                     SearchResultsFilter(
                         filterOptions = uiState.filterOptions,
                         onToggleDeadTorrents = viewModel::toggleDeadTorrents,
+                        onToggleHideViewed = viewModel::toggleHideViewedTorrents,
                         onToggleSearchProvider = viewModel::toggleSearchProviderResults,
                         onSelectAllSearchProviders = viewModel::selectAllSearchProviders,
                         onDeselectAllSearchProviders = viewModel::deselectAllSearchProviders,
