@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import com.prajwalch.torrentsearch.data.repository.BookmarksRepository
+import com.prajwalch.torrentsearch.data.repository.BookmarkRepository
 import com.prajwalch.torrentsearch.data.repository.SearchHistoryRepository
 import com.prajwalch.torrentsearch.data.repository.SettingsRepository
 import com.prajwalch.torrentsearch.data.repository.ViewedTorrentsRepository
@@ -84,7 +84,7 @@ data class SearchProviderFilterOption(
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchTorrentsUseCase: SearchTorrentsUseCase,
-    private val bookmarksRepository: BookmarksRepository,
+    private val bookmarkRepository: BookmarkRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
     private val settingsRepository: SettingsRepository,
     private val viewedTorrentsRepository: ViewedTorrentsRepository,
@@ -294,7 +294,7 @@ class SearchViewModel @Inject constructor(
 
     fun bookmarkTorrent(torrent: Torrent) {
         viewModelScope.launch {
-            bookmarksRepository.bookmarkTorrent(torrent = torrent)
+            bookmarkRepository.bookmarkTorrent(torrent = torrent)
         }
     }
 
