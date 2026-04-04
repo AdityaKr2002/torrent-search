@@ -1,6 +1,6 @@
 package com.prajwalch.torrentsearch.data.repository
 
-import com.prajwalch.torrentsearch.data.remote.TorrentsRemoteDataSource
+import com.prajwalch.torrentsearch.data.remote.TorrentRemoteDataSource
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.SearchException
 import com.prajwalch.torrentsearch.domain.model.SearchResults
@@ -23,7 +23,7 @@ import javax.inject.Inject
 typealias TorrentFileId = UUID
 
 class TorrentRepository @Inject constructor(
-    private val remoteDataSource: TorrentsRemoteDataSource,
+    private val remoteDataSource: TorrentRemoteDataSource,
 ) {
     private val torrentFileContentCache = mutableMapOf<TorrentFileId, ByteArray>()
 
