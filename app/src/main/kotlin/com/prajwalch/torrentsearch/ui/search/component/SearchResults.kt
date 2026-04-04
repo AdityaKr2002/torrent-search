@@ -70,7 +70,7 @@ fun SearchResults(
                     category = it.category,
                     providerName = it.providerName,
                     isNSFW = it.isNSFW(),
-                    isViewed = runCatching { it.id in viewedIds }.getOrDefault(false),
+                    isViewed = it.id in viewedIds,
                 )
                 HorizontalDivider()
             }
