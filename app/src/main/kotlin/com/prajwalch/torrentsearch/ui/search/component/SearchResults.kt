@@ -53,11 +53,7 @@ fun SearchResults(
                 )
             }
 
-            items(
-                items = searchResults,
-                key = { "${it.name}_${it.providerName}" },
-                contentType = { it.category },
-            ) {
+            items(items = searchResults, contentType = { it.category }) {
                 TorrentListItem(
                     modifier = Modifier
                         .animateItem()
