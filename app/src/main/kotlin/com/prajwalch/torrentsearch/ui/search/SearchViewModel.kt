@@ -563,8 +563,8 @@ private class SearchResultsProcessor(
             .successes
             .asSequence()
             .filterNot { it.providerName in filters.excludedProviders }
-            .filter { nsfwModeEnabled || !it.isNSFW() }
-            .filter { filters.deadTorrents || !it.isDead() }
+            .filter { nsfwModeEnabled || !it.isNSFW }
+            .filter { filters.deadTorrents || !it.isDead }
             .filter { !filters.hideViewed || it.infoHash !in hidenViewedHashes }
             .filter { filters.query.isBlank() || it.name.contains(filters.query, true) }
             .filter { filters.category == Category.All || filters.category == it.category }

@@ -51,7 +51,7 @@ class BookmarksViewModel @Inject constructor(
         settingsRepository.bookmarksSortOptions,
     ) { filterQuery, bookmarks, nsfwModeEnabled, sortOptions ->
         val bookmarks = bookmarks
-            .filter { nsfwModeEnabled || !it.isNSFW() }
+            .filter { nsfwModeEnabled || !it.isNSFW }
             .filter { filterQuery.isBlank() || it.name.contains(filterQuery, ignoreCase = true) }
             .sortedWith(
                 createSortComparator(criteria = sortOptions.criteria, order = sortOptions.order)
