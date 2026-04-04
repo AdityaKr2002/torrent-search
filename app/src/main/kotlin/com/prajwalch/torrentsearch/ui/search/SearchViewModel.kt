@@ -116,13 +116,14 @@ class SearchViewModel @Inject constructor(
     /**
      * Set of viewed torrent IDs for efficient lookup.
      */
-    val viewedIds: StateFlow<Set<String>> = viewedTorrentsRepository
-        .getAllViewedIds()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5.seconds),
-            initialValue = emptySet()
-        )
+    val viewedTorrentHashes: StateFlow<Set<String>> =
+        viewedTorrentsRepository
+            .getAllViewedHashes()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5.seconds),
+                initialValue = emptySet()
+            )
 
     /**
      * The search results processor responsible for filtering, sorting, and
@@ -131,7 +132,7 @@ class SearchViewModel @Inject constructor(
     private val resultsProcessor = SearchResultsProcessor(
         searchResults = searchOrchestrator.searchResults,
         settingsRepository = settingsRepository,
-        viewedIds = viewedIds,
+        viewedTorrentHashes = viewedTorrentHashes,
         initialSelectedCategory = searchCategory,
     )
 
@@ -297,9 +298,9 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun markAsViewed(torrent: Torrent) {
+    fun markAsViewed(infoHash: String) {
         viewModelScope.launch {
-            viewedTorrentsRepository.markAsViewed(torrent.id)
+            viewedTorrentsRepository.markAsViewed(infoHash)
         }
     }
 
@@ -475,9 +476,9 @@ private class SearchResultsProcessor(
      */
     settingsRepository: SettingsRepository,
     /**
-     * Flow of viewed torrent IDs for filtering.
+     * Flow of viewed torrent hashes for filtering.
      */
-    private val viewedIds: Flow<Set<String>>,
+    private val viewedTorrentHashes: Flow<Set<String>>,
     /**
      * The [Category] to use as an initial value for [Filters.category].
      */
@@ -522,7 +523,7 @@ private class SearchResultsProcessor(
      * This is captured when hideViewed filter is enabled to avoid instant hiding
      * of newly viewed torrents (better UX).
      */
-    private val hiddenViewedIds = MutableStateFlow<Set<String>>(emptySet())
+    private val hiddenViewedHashes = MutableStateFlow<Set<String>>(emptySet())
 
     /**
      * The asynchronous output stream of processed search results.
@@ -533,7 +534,7 @@ private class SearchResultsProcessor(
             filters,
             sortOptions,
             settingsRepository.enableNSFWMode,
-            hiddenViewedIds,
+            hiddenViewedHashes,
             ::processSearchResults
         ).flowOn(Dispatchers.Default)
 
@@ -552,7 +553,7 @@ private class SearchResultsProcessor(
         filters: Filters,
         sortOptions: SortOptions,
         nsfwModeEnabled: Boolean,
-        hiddenViewedIds: Set<String>,
+        hidenViewedHashes: Set<String>,
     ): SearchResults {
         val sortComparator = createSortComparator(
             criteria = sortOptions.criteria,
@@ -564,7 +565,7 @@ private class SearchResultsProcessor(
             .filterNot { it.providerName in filters.excludedProviders }
             .filter { nsfwModeEnabled || !it.isNSFW() }
             .filter { filters.deadTorrents || !it.isDead() }
-            .filter { !filters.hideViewed || it.id !in hiddenViewedIds }
+            .filter { !filters.hideViewed || it.infoHash !in hidenViewedHashes }
             .filter { filters.query.isBlank() || it.name.contains(filters.query, true) }
             .filter { filters.category == Category.All || filters.category == it.category }
             .sortedWith(comparator = sortComparator)
@@ -640,14 +641,15 @@ private class SearchResultsProcessor(
      * won't instantly disappear (better UX per discussion).
      */
     suspend fun toggleHideViewed() {
-        val newHideViewed = !filters.value.hideViewed
-        if (newHideViewed) {
+        val hideViewed = !filters.value.hideViewed
+        filters.update { it.copy(hideViewed = hideViewed) }
+
+        if (hideViewed) {
             // Capture current viewed IDs when enabling the filter
-            hiddenViewedIds.value = viewedIds.first()
+            hiddenViewedHashes.value = viewedTorrentHashes.first()
         } else {
             // Clear when disabling
-            hiddenViewedIds.value = emptySet()
+            hiddenViewedHashes.value = emptySet()
         }
-        filters.update { it.copy(hideViewed = newHideViewed) }
     }
 }

@@ -1,9 +1,9 @@
 package com.prajwalch.torrentsearch.providers
 
 import com.prajwalch.torrentsearch.domain.model.Category
-import com.prajwalch.torrentsearch.domain.model.InfoHashOrMagnetUri
 import com.prajwalch.torrentsearch.domain.model.Torrent
 import com.prajwalch.torrentsearch.util.DateUtils
+import com.prajwalch.torrentsearch.util.TorrentUtils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -52,8 +52,10 @@ class AnimeTosho : SearchProvider {
         val links = entryDiv.selectFirst("div.links") ?: return null
         val fileDownloadLink = links.selectFirst("a.dllink")?.attr("href")
         val magnetUri = links.selectFirst("""a[href^="magnet:"]""")?.attr("href") ?: return null
+        val infoHash = TorrentUtils.getInfoHashFromMagnetUri(magnetUri)
 
         return Torrent(
+            infoHash = infoHash,
             name = name,
             size = size,
             seeders = seeders,
@@ -62,7 +64,7 @@ class AnimeTosho : SearchProvider {
             uploadDate = uploadDate,
             category = info.specializedCategory,
             descriptionPageUrl = descriptionPageUrl,
-            infoHashOrMagnetUri = InfoHashOrMagnetUri.MagnetUri(magnetUri),
+            magnetUri = magnetUri,
             fileDownloadLink = fileDownloadLink,
         )
     }

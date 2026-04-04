@@ -1,8 +1,8 @@
 package com.prajwalch.torrentsearch.providers
 
 import com.prajwalch.torrentsearch.domain.model.Category
-import com.prajwalch.torrentsearch.domain.model.InfoHashOrMagnetUri
 import com.prajwalch.torrentsearch.domain.model.Torrent
+import com.prajwalch.torrentsearch.util.TorrentUtils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -69,6 +69,7 @@ class UIndex : SearchProvider {
         // It contains magnet link and torrent name.
         val secondTd = tr.selectFirst("td.sr-col-name") ?: return null
         val magnetUri = secondTd.selectFirst("a.sr-magnet")?.attr("href") ?: return null
+        val infoHash = TorrentUtils.getInfoHashFromMagnetUri(magnetUri)
         // Anchor which contains a name and description page URL.
         val nameHref = secondTd.selectFirst("a.sr-torrent-link") ?: return null
         val torrentName = nameHref.ownText()
@@ -90,6 +91,7 @@ class UIndex : SearchProvider {
             ?: return null
 
         return Torrent(
+            infoHash = infoHash,
             name = torrentName,
             size = size,
             seeders = seeders.toUIntOrNull() ?: 0u,
@@ -98,7 +100,7 @@ class UIndex : SearchProvider {
             uploadDate = uploadDate,
             category = category,
             descriptionPageUrl = descriptionPageUrl,
-            infoHashOrMagnetUri = InfoHashOrMagnetUri.MagnetUri(uri = magnetUri),
+            magnetUri = magnetUri,
         )
     }
 
