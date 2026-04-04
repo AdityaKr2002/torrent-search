@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 typealias TorrentFileId = UUID
 
-class TorrentsRepository @Inject constructor(
+class TorrentRepository @Inject constructor(
     private val remoteDataSource: TorrentsRemoteDataSource,
 ) {
     private val torrentFileContentCache = mutableMapOf<TorrentFileId, ByteArray>()
