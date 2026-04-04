@@ -477,7 +477,7 @@ private class SearchResultsProcessor(
     /**
      * Flow of viewed torrent IDs for filtering.
      */
-    viewedIds: Flow<Set<String>>,
+    private val viewedIds: Flow<Set<String>>,
     /**
      * The [Category] to use as an initial value for [Filters.category].
      */
@@ -511,11 +511,6 @@ private class SearchResultsProcessor(
      * The internal mutable source for sort options.
      */
     private val sortOptions = MutableStateFlow(SortOptions())
-
-    /**
-     * Reference to viewed IDs flow for capturing when filter is toggled.
-     */
-    private val viewedIdsFlow = viewedIds
 
     /**
      * The publicly observable state of the processor.
@@ -569,7 +564,7 @@ private class SearchResultsProcessor(
             .filterNot { it.providerName in filters.excludedProviders }
             .filter { nsfwModeEnabled || !it.isNSFW() }
             .filter { filters.deadTorrents || !it.isDead() }
-            .filter { !filters.hideViewed || runCatching { it.id }.getOrNull() !in hiddenViewedIds }
+            .filter { !filters.hideViewed || it.id !in hiddenViewedIds }
             .filter { filters.query.isBlank() || it.name.contains(filters.query, true) }
             .filter { filters.category == Category.All || filters.category == it.category }
             .sortedWith(comparator = sortComparator)
@@ -648,7 +643,7 @@ private class SearchResultsProcessor(
         val newHideViewed = !filters.value.hideViewed
         if (newHideViewed) {
             // Capture current viewed IDs when enabling the filter
-            hiddenViewedIds.value = viewedIdsFlow.first()
+            hiddenViewedIds.value = viewedIds.first()
         } else {
             // Clear when disabling
             hiddenViewedIds.value = emptySet()
