@@ -57,7 +57,6 @@ data class SearchUiState(
     val searchResults: SearchResults = SearchResults(),
     val sortOptions: SortOptions = SortOptions(),
     val filterOptions: FilterOptions = FilterOptions(),
-    val torrentFileDownloadState: TorrentFileDownloadState = TorrentFileDownloadState.Empty,
     val isLoading: Boolean = true,
     val isSearching: Boolean = false,
     val isRefreshing: Boolean = false,
