@@ -9,6 +9,9 @@ import com.prajwalch.torrentsearch.data.repository.SearchHistoryRepository
 import com.prajwalch.torrentsearch.data.repository.SettingsRepository
 import com.prajwalch.torrentsearch.data.repository.ViewedTorrentRepository
 import com.prajwalch.torrentsearch.domain.SearchTorrentsUseCase
+import com.prajwalch.torrentsearch.domain.TorrentFileDownloadEvent
+import com.prajwalch.torrentsearch.domain.TorrentFileDownloadState
+import com.prajwalch.torrentsearch.domain.TorrentFileDownloader
 import com.prajwalch.torrentsearch.domain.model.Category
 import com.prajwalch.torrentsearch.domain.model.SearchResults
 import com.prajwalch.torrentsearch.domain.model.SortCriteria
@@ -16,9 +19,6 @@ import com.prajwalch.torrentsearch.domain.model.SortOptions
 import com.prajwalch.torrentsearch.domain.model.SortOrder
 import com.prajwalch.torrentsearch.domain.model.Torrent
 import com.prajwalch.torrentsearch.network.ConnectivityChecker
-import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloadEvent
-import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloadState
-import com.prajwalch.torrentsearch.torrentfiledownloader.TorrentFileDownloader
 import com.prajwalch.torrentsearch.util.createSortComparator
 
 import dagger.hilt.android.lifecycle.HiltViewModel

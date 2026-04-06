@@ -1,4 +1,4 @@
-package com.prajwalch.torrentsearch.torrentfiledownloader
+package com.prajwalch.torrentsearch.domain
 
 import com.prajwalch.torrentsearch.data.repository.TorrentFileId
 import com.prajwalch.torrentsearch.data.repository.TorrentFileRepository
