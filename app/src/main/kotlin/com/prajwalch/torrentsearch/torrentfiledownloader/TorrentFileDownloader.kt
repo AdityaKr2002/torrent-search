@@ -1,7 +1,7 @@
 package com.prajwalch.torrentsearch.torrentfiledownloader
 
 import com.prajwalch.torrentsearch.data.repository.TorrentFileId
-import com.prajwalch.torrentsearch.data.repository.TorrentRepository
+import com.prajwalch.torrentsearch.data.repository.TorrentFileRepository
 
 import dagger.hilt.android.scopes.ViewModelScoped
 
@@ -37,7 +37,7 @@ sealed interface TorrentFileDownloadEvent {
 
 @ViewModelScoped
 class TorrentFileDownloader @Inject constructor(
-    private val torrentRepository: TorrentRepository,
+    private val torrentFileRepository: TorrentFileRepository,
 ) {
     private val _state = MutableStateFlow<TorrentFileDownloadState>(TorrentFileDownloadState.Empty)
     val state = _state.asStateFlow()
@@ -52,7 +52,7 @@ class TorrentFileDownloader @Inject constructor(
         _state.value = TorrentFileDownloadState.Downloading
 
         try {
-            val fileId = torrentRepository.downloadTorrentFile(url)
+            val fileId = torrentFileRepository.downloadTorrentFile(url)
             if (fileId == null) {
                 _events.send(TorrentFileDownloadEvent.FileNotFound)
             } else {
@@ -79,7 +79,7 @@ class TorrentFileDownloader @Inject constructor(
         _state.value = TorrentFileDownloadState.Writing
 
         try {
-            torrentRepository.writeTorrentFile(pendingFileId, outputStream)
+            torrentFileRepository.writeTorrentFile(pendingFileId, outputStream)
             _events.send(TorrentFileDownloadEvent.WriteSucceed)
         } catch (e: IOException) {
             _events.send(TorrentFileDownloadEvent.WriteFailed(e.message))
