@@ -88,7 +88,7 @@ class ThePirateBay : SearchProvider {
         val id = torrentObject.getString("id") ?: return null
         val descriptionPageUrl = "${info.url}/description.php?id=$id"
 
-        val infoHash = torrentObject.getString("info_hash") ?: return null
+        val infoHash = torrentObject.getString("info_hash")?.lowercase()?.trim() ?: return null
         val sizeBytes = torrentObject.getString("size") ?: return null
         val size = FileSizeUtils.formatBytes(bytes = sizeBytes)
         val seeders = torrentObject.getString("seeders")?.toUIntOrNull() ?: return null
