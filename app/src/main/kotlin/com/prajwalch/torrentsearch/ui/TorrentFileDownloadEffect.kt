@@ -76,7 +76,7 @@ fun TorrentFileDownloadEffect(
 
     LaunchedEffect(state) {
         when (state) {
-            TorrentFileDownloadState.Empty -> {
+            TorrentFileDownloadState.Idle -> {
                 /* Do nothing */
             }
 

@@ -302,13 +302,13 @@ class SearchViewModel @Inject constructor(
 
     fun downloadTorrentFile(url: String, fileName: String) {
         viewModelScope.launch {
-            torrentFileDownloader.downloadFile(url = url, fileName = fileName)
+            torrentFileDownloader.download(url = url, fileName = fileName)
         }
     }
 
-    fun downloadTorrentFileFromInfoHash(infoHash: String, fileName: String) {
+    fun downloadTorrentFileUsingInfoHash(infoHash: String, fileName: String) {
         viewModelScope.launch {
-            torrentFileDownloader.downloadFileFromInfoHash(
+            torrentFileDownloader.tryDownloadUsingInfoHash(
                 infoHash = infoHash,
                 fileName = fileName,
             )
@@ -317,7 +317,7 @@ class SearchViewModel @Inject constructor(
 
     fun writeTorrentFile(outputStream: OutputStream) {
         viewModelScope.launch {
-            torrentFileDownloader.writeFile(outputStream = outputStream)
+            torrentFileDownloader.writeFileContent(outputStream)
         }
     }
 }
