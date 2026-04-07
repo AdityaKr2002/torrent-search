@@ -1,8 +1,10 @@
 package com.prajwalch.torrentsearch.ui.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -10,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 
@@ -35,6 +38,12 @@ fun TorrentListItem(
     ListItem(
         modifier = modifier.alpha(contentAlpha),
         overlineContent = { Text(text = uploadDate) },
+        leadingContent = {
+            Icon(
+                painter = painterResource(category.iconResId()),
+                contentDescription = null,
+            )
+        },
         headlineContent = {
             Text(
                 text = name,
@@ -62,6 +71,21 @@ fun TorrentListItem(
             }
         },
     )
+}
+
+@DrawableRes
+private fun Category?.iconResId(): Int = when (this) {
+    null -> R.drawable.ic_block
+    Category.All -> R.drawable.ic_category
+    Category.Anime -> R.drawable.ic_comic_bubble
+    Category.Apps -> R.drawable.ic_widgets
+    Category.Books -> R.drawable.ic_book
+    Category.Games -> R.drawable.ic_sports_esports
+    Category.Movies -> R.drawable.ic_movie
+    Category.Music -> R.drawable.ic_music_note
+    Category.Porn -> R.drawable.ic_18_up_rating
+    Category.Series -> R.drawable.ic_tv
+    Category.Other -> R.drawable.ic_category
 }
 
 @Composable
