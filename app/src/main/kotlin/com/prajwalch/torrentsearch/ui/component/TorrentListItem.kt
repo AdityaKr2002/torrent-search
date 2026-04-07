@@ -1,6 +1,5 @@
 package com.prajwalch.torrentsearch.ui.component
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 
 import com.prajwalch.torrentsearch.R
 import com.prajwalch.torrentsearch.domain.model.Category
+import com.prajwalch.torrentsearch.ui.iconResId
 import com.prajwalch.torrentsearch.ui.theme.spaces
 
 @Composable
@@ -71,21 +71,6 @@ fun TorrentListItem(
             }
         },
     )
-}
-
-@DrawableRes
-private fun Category?.iconResId(): Int = when (this) {
-    null -> R.drawable.ic_block
-    Category.All -> R.drawable.ic_category
-    Category.Anime -> R.drawable.ic_comic_bubble
-    Category.Apps -> R.drawable.ic_widgets
-    Category.Books -> R.drawable.ic_book
-    Category.Games -> R.drawable.ic_sports_esports
-    Category.Movies -> R.drawable.ic_movie
-    Category.Music -> R.drawable.ic_music_note
-    Category.Porn -> R.drawable.ic_18_up_rating
-    Category.Series -> R.drawable.ic_tv
-    Category.Other -> R.drawable.ic_category
 }
 
 @Composable
